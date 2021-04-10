@@ -89,6 +89,15 @@ int main()
                         }
                     }
                 }
+                else if(e.key.code == sf::Keyboard::W)
+                {
+                    int totalPoints = 0;
+                    for(auto it = doodle.begin(); it != doodle.end(); it++)
+                    {
+                        totalPoints+=(*it)->count();
+                    }
+                    std::cout << "total dots on board: " << totalPoints << std::endl;
+                }
                 else if(e.key.code == sf::Keyboard::G)
                 {
                     penInk = sf::Color(34,139,34);

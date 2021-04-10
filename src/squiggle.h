@@ -10,6 +10,7 @@ private:
     std::stack<sf::Vector2i> points;
     std::list<sf::RectangleShape*> lines;
     int mag;
+    int size;
 public:
     Squiggle(sf::Vector2i& start, int size, sf::Color color);
 
@@ -17,4 +18,5 @@ public:
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
     void zoom(int magnify, sf::Vector2i& mPoint);
+    int count();
 };

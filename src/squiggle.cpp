@@ -4,6 +4,7 @@ Squiggle::Squiggle(sf::Vector2i& start, int size, sf::Color color)
 {
     points.push(start);
     mag = 1;
+    this->size = size;
     sf::RectangleShape* l = new sf::RectangleShape();
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
@@ -44,6 +45,7 @@ void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
         {
             nextStep.y = 0;
         }
+        
         l->setPosition(l->getPosition()+sf::Vector2f(nextStep));
     }
 }
@@ -114,4 +116,9 @@ void Squiggle::addPoint(sf::Vector2i& p, int size, sf::Color color)
         }
     }
     points.push(p);
+}
+
+int Squiggle::count()
+{
+    return lines.size();
 }
