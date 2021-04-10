@@ -1,14 +1,13 @@
 #include "squiggle.h"
 
-Squiggle::Squiggle(sf::Vector2i& start, int size, sf::Color color)
+Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
 {
     points.push(start);
     mag = 1;
-    this->size = size;
-    sf::RectangleShape* l = new sf::RectangleShape();
+    this->width = width;
+    sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
-    l->setSize(sf::Vector2f(size, size));
     lines.push_back(l);
 }
 
@@ -59,59 +58,52 @@ void Squiggle::move(sf::Vector2i& offset)
     }
 }
 
-void Squiggle::addPoint(sf::Vector2i& p, int size, sf::Color color)
+void Squiggle::addPoint(sf::Vector2i& p, int width, sf::Color color)
 {
-    sf::Vector2f lastPoint = sf::Vector2f(points.top());
-    if(lastPoint == sf::Vector2f(p))
+    sf::Vector2f prev = sf::Vector2f(points.top());
+    if(prev == sf::Vector2f(p))
         return;
+    //calculate slopes
+    float slopeYoverX = 0;
+    float slopeXoverY = 0;
+    if(prev.x > p.x)
+        slopeYoverX = float(float(p.y-prev.y)/(float(prev.x-p.x)));
+    else if(prev.x < p.x)
+        slopeYoverX = float(float(p.y-prev.y)/(float(p.x-prev.x)));
 
-    bool xPlane = true;
-    if( abs((int(float(p.y-lastPoint.y)/(float(p.x-lastPoint.x))))) > 
-        abs((int(float(p.x-lastPoint.x)/(float(p.y-lastPoint.y))))) )
-        xPlane = false;
+    if(prev.y > p.y)
+        slopeXoverY = float(float(p.x-prev.x)/(float(prev.y-p.y)));
+    else if(prev.y < p.y)
+        slopeXoverY = float(float(p.x-prev.x)/(float(p.y-prev.y)));
 
-    if(abs((int(p.x-lastPoint.x))) != 0 && (xPlane || p.y==lastPoint.y))
+    //determine the easier slope to work with
+    bool xAxis = !(abs(int(slopeYoverX)) > abs(int(slopeXoverY)));
+
+    //choose x-axis as independent
+    if(prev.x != p.x && (xAxis || prev.y == p.y))
     {
-        float slope = float(float(p.y-lastPoint.y)/(float(p.x-lastPoint.x)));
-        if(lastPoint.x > p.x)
-            slope = float(float(p.y-lastPoint.y)/(float(lastPoint.x-p.x)));
-        while(lastPoint.x != p.x)
+        while(prev.x != p.x)
         {
-            if(lastPoint.x < p.x)
-                lastPoint.x++;
-            else
-                lastPoint.x--;
+            prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
+            prev.y+=slopeYoverX;
 
-            lastPoint.y+=slope;
-            sf::RectangleShape* l = new sf::RectangleShape();
+            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
             l->setFillColor(color);
-            l->setSize(sf::Vector2f(size, size));
-            l->setPosition(sf::Vector2f(lastPoint));
+            l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
         }
     }
-    //undefined slope
+    //choose y-axis as independent
     else
     {
-        float slope = float(float(p.x-lastPoint.x)/(float(p.y-lastPoint.y)));
-        if(lastPoint.y > p.y)
-            slope = float(float(p.x-lastPoint.x)/(float(lastPoint.y-p.y)));
-        if(p.x == lastPoint.x)
-            slope = 0;
-
-        while(lastPoint.y != p.y)
+        while(prev.y != p.y)
         {
-            if(lastPoint.y < p.y)
-                lastPoint.y++;
-            else
-                lastPoint.y--;
+            prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
+            prev.x+=slopeXoverY;
 
-            lastPoint.x+=slope;
-
-            sf::RectangleShape* l = new sf::RectangleShape();
+            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
             l->setFillColor(color);
-            l->setSize(sf::Vector2f(size, size));
-            l->setPosition(sf::Vector2f(lastPoint));
+            l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
         }
     }
