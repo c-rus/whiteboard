@@ -5,10 +5,11 @@
 #include <string>
 #include "squiggle.h"
 #include "stylus.h"
+#include "board.h"
 
 /*
 TODO: key outlooks
-    - draw only top-most pixel (use unordered_map)
+    - draw only top-most pixel (use unordered_map or array)
     - draw only visible pixels (not offscreen pixels)
 */
 int main()
@@ -17,11 +18,10 @@ int main()
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     
-    std::list<Squiggle*> doodle;
-    std::list<Squiggle*> reverseDoodle;
-    sf::Vector2i cord, lastCord, diff;
+    sf::Vector2i loc, prevLoc, diff;
 
     Stylus pen(5, sf::Color(0,0,0));
+    Board b;
 
     int magnifier = 10;
 
@@ -40,30 +40,23 @@ int main()
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   
-                cord = sf::Mouse::getPosition(window);
-                lastCord = cord;
+                loc = sf::Mouse::getPosition(window);
+                prevLoc = loc;
                 diff = sf::Vector2i(0,0);
                 //std::cout << cord.x << " " << cord.y << std::endl;
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else if(!eraser)
                 {
-                    doodle.push_back(new Squiggle(cord, pen.getWidth(), pen.getInk()));
+                    b.startSqui(loc, pen.getWidth(), pen.getInk());
                     pressed = true;
                 }
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
                 std::cout << e.mouseWheel.delta << std::endl;
-                cord = sf::Mouse::getPosition(window);
+                loc = sf::Mouse::getPosition(window);
                 magnifier = e.mouseWheel.delta;
-                if(magnifier != 0)
-                {
-                    for(auto it = doodle.begin(); it != doodle.end(); it++)
-                    {
-                        (*it)->zoom(magnifier, cord);
-                    }
-                }
             }
             else if(e.type == sf::Event::KeyPressed)
             {
@@ -73,36 +66,17 @@ int main()
                 }
                 else if(e.key.code == sf::Keyboard::Z)
                 {
-                    if(cmd)
-                    {
-                        if(doodle.size() > 0)
-                        {
-                            reverseDoodle.push_back(doodle.back());
-                            doodle.pop_back();
-                            std::cout << "undo squiggle!" << std::endl;
-                        }
-                    }
+                    if(cmd) //undo
+                        b.undo();
                 }
                 else if(e.key.code == sf::Keyboard::X)
                 {
-                    if(cmd)
-                    {
-                        if(reverseDoodle.size() > 0)
-                        {
-                            doodle.push_back(reverseDoodle.back());
-                            reverseDoodle.pop_back();
-                            std::cout << "redo squiggle!" << std::endl;
-                        }
-                    }
+                    if(cmd) //redo
+                        b.redo();
                 }
                 else if(e.key.code == sf::Keyboard::W)
                 {
-                    int totalPoints = 0;
-                    for(auto it = doodle.begin(); it != doodle.end(); it++)
-                    {
-                        totalPoints+=(*it)->count();
-                    }
-                    std::cout << "total dots on board: " << totalPoints << std::endl;
+
                 }
                 else if(e.key.code == sf::Keyboard::G)
                 {
@@ -138,18 +112,7 @@ int main()
                 }
                 else if(e.key.code == sf::Keyboard::C)
                 {
-                    while(doodle.size() > 0)
-                    {
-                        Squiggle* s = doodle.back();
-                        delete s;
-                        doodle.pop_back();
-                    }
-                    while(reverseDoodle.size() > 0)
-                    {
-                        Squiggle* s = reverseDoodle.back();
-                        delete s;
-                        reverseDoodle.pop_back();
-                    }
+                    b.clear();
                 }
             }
             else if(e.type == sf::Event::KeyReleased)
@@ -161,18 +124,16 @@ int main()
             }
         }
 
+        loc = sf::Mouse::getPosition(window);
         if(pressed && !eraser)
-        {
-            cord = sf::Mouse::getPosition(window);
-            doodle.back()->addPoint(cord, pen.getWidth(), pen.getInk());
-        }
+            b.continueSqui(loc, pen.getWidth(), pen.getInk());
         else if(pressed)
         {
             //TODO: Fix up erasing
             int eRange = 6;
             for(int i = -eRange; i <= eRange; i++)
             {
-                sf::Vector2f tempC = sf::Vector2f(cord);
+                sf::Vector2f tempC = sf::Vector2f(loc);
                 tempC.x+=i;
                 for(int j = -eRange; j <= eRange; j++)
                 {
@@ -183,32 +144,13 @@ int main()
         }
         else if(pan)
         {
-            cord = sf::Mouse::getPosition(window);
-            diff = cord - lastCord;
-            for(auto it = doodle.begin(); it != doodle.end(); it++)
-                (*it)->move(diff);
-            lastCord = cord;
+            diff = loc - prevLoc;
+            b.pan(diff);
+            prevLoc = loc;
         }
 
         window.clear(sf::Color::White);
-
-        for(auto it = doodle.begin(); it != doodle.end(); it++)
-        {
-            (*it)->draw(window);
-        }
+        b.draw(window);
         window.display();
-    }
-
-    while(doodle.size() > 0)
-    {
-        Squiggle* s = doodle.back();
-        delete s;
-        doodle.pop_back();
-    }
-    while(reverseDoodle.size() > 0)
-    {
-        Squiggle* s = reverseDoodle.back();
-        delete s;
-        reverseDoodle.pop_back();
     }
 }
