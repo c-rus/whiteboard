@@ -9,8 +9,10 @@ class Squiggle
 private:
     std::stack<sf::Vector2i> points;
     std::list<sf::RectangleShape*> lines;
-    int mag;
+    //TODO: create a box to encapsulate the squiggle's boundaries
     int width;
+    const int MAX_W = sf::VideoMode::getDesktopMode().width;
+    const int MAX_H = sf::VideoMode::getDesktopMode().height;
 public:
     Squiggle(sf::Vector2i& start, int width, sf::Color color);
 

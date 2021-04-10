@@ -11,19 +11,17 @@
 TODO: key outlooks
     - draw only top-most pixel (use unordered_map or array)
     - draw only visible pixels (not offscreen pixels)
+    -everytime things are moved, try to fit into board's array (start with top squiggles)
 */
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1200, 900), "Whiteboard", sf::Style::None);
+    sf::RenderWindow window(sf::VideoMode(1200, 900), "Whiteboard");
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
-    
     sf::Vector2i loc, prevLoc, diff;
 
     Stylus pen(5, sf::Color(0,0,0));
     Board b(window.getSize().x, window.getSize().y);
-
-    int magnifier = 10;
 
     bool pressed, pan, cmd;
     pressed = pan = cmd = false;
@@ -34,6 +32,12 @@ int main()
         {
             if(e.type == sf::Event::Closed)
                 window.close();
+            else if(e.type == sf::Event::Resized)
+            {
+                sf::FloatRect visibleArea(0, 0, e.size.width, e.size.height);
+                b.resize(visibleArea.width, visibleArea.height);
+                window.setView(sf::View(visibleArea));
+            }
             else if(e.type == sf::Event::MouseButtonReleased)
             {
                 pressed = pan = false;
@@ -52,9 +56,10 @@ int main()
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
-                std::cout << e.mouseWheel.delta << std::endl;
+                //std::cout << e.mouseWheel.delta << std::endl;
                 loc = sf::Mouse::getPosition(window);
-                magnifier = e.mouseWheel.delta;
+                sf::Vector2i scrollPace(0, e.mouseWheel.delta*4);
+                b.pan(scrollPace);
             }
             else if(e.type == sf::Event::KeyPressed)
             {

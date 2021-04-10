@@ -22,7 +22,6 @@ void Squiggle::draw(sf::RenderWindow& win)
 //TODO: Work on fixing zoom 
 void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
 {
-    mag += magnify;
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         auto& l = *it;

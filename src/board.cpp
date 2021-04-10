@@ -24,12 +24,20 @@ void Board::continueSqui(sf::Vector2i& loc, int w, sf::Color i)
 void Board::pan(sf::Vector2i& offset)
 {
     for(auto it = scribs.begin(); it != scribs.end(); it++)
-                (*it)->move(offset);
+        (*it)->move(offset);
 }
 
 void Board::erase(sf::Vector2i& loc, int w)
 {
 
+}
+
+void Board::resize(int w, int h)
+{
+    width = w;
+    height = h;
+    std::cout << "WIDTH: " << width << std::endl;
+    std::cout << "HEIGHT: " << height << std::endl;
 }
 
 void Board::draw(sf::RenderWindow& win)
