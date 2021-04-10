@@ -4,6 +4,7 @@
 #include <unordered_map>
 #include <string>
 #include "squiggle.h"
+#include "stylus.h"
 
 int main()
 {
@@ -15,8 +16,8 @@ int main()
     std::list<Squiggle*> reverseDoodle;
     sf::Vector2i cord, lastCord, diff;
 
-    sf::Color penInk = sf::Color::Black;
-    int penSize = 5;
+    Stylus pen(5, sf::Color(0,0,0));
+
     int magnifier = 10;
 
     bool pressed, pan, eraser, cmd;
@@ -42,7 +43,7 @@ int main()
                     pan = true;
                 else if(!eraser)
                 {
-                    doodle.push_back(new Squiggle(cord, penSize, penInk));
+                    doodle.push_back(new Squiggle(cord, pen.getWidth(), pen.getInk()));
                     pressed = true;
                 }
             }
@@ -100,33 +101,31 @@ int main()
                 }
                 else if(e.key.code == sf::Keyboard::G)
                 {
-                    penInk = sf::Color(34,139,34);
+                    pen.setInk(sf::Color(34,139,34));
                 }
                 else if(e.key.code == sf::Keyboard::B)
                 {
-                    penInk = sf::Color::Black;
+                    pen.setInk(sf::Color::Black);
                 }
                 else if(e.key.code == sf::Keyboard::O)
                 {
-                    penInk = sf::Color(255,125,0);
+                    pen.setInk(sf::Color(255,125,0));
                 }
                 else if(e.key.code == sf::Keyboard::R)
                 {
-                    penInk = sf::Color::Red;
+                    pen.setInk(sf::Color::Red);
                 }
                 else if(e.key.code == sf::Keyboard::L)
                 {
-                    penInk = sf::Color::Blue;
+                    pen.setInk(sf::Color::Blue);
                 }
                 else if(e.key.code == sf::Keyboard::Up)
                 {
-                    penSize+=1;
+                    pen.setWidth(pen.getWidth()+1);
                 }
                 else if(e.key.code == sf::Keyboard::Down)
                 {
-                    penSize-=1;
-                    if(penSize < 1)
-                        penSize = 1;
+                    pen.setWidth(pen.getWidth()-1);
                 }
                 else if(e.key.code == sf::Keyboard::E)
                 {
@@ -160,7 +159,7 @@ int main()
         if(pressed && !eraser)
         {
             cord = sf::Mouse::getPosition(window);
-            doodle.back()->addPoint(cord, penSize, penInk);
+            doodle.back()->addPoint(cord, pen.getWidth(), pen.getInk());
         }
         else if(pressed)
         {
