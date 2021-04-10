@@ -3,6 +3,7 @@
 Squiggle::Squiggle(sf::Vector2i& start, int size, sf::Color color)
 {
     points.push(start);
+    mag = 1;
     sf::RectangleShape* l = new sf::RectangleShape();
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
@@ -16,6 +17,19 @@ void Squiggle::draw(sf::RenderWindow& win)
     {
         win.draw(**it);
     }
+}
+
+//TODO: Work on fixing zoom 
+void Squiggle::zoom(int magnify)
+{
+    mag += magnify;
+    for(auto it = lines.begin(); it != lines.end(); it++)
+    {
+        auto& l = *it;
+        l->setScale(mag, mag);
+    } 
+    sf::Vector2i v(magnify, magnify);
+    move(v);
 }
 
 void Squiggle::move(sf::Vector2i& offset)
@@ -32,8 +46,13 @@ void Squiggle::addPoint(sf::Vector2i& p, int size, sf::Color color)
     sf::Vector2f lastPoint = sf::Vector2f(points.top());
     if(lastPoint == sf::Vector2f(p))
         return;
-    //TODO: Generate smoother lines are steeper slopes
-    if(abs((int(p.x-lastPoint.x))) != 0 && abs((int(float(p.y-lastPoint.y)/(float(p.x-lastPoint.x))))) < 7)
+
+    bool xPlane = true;
+    if( abs((int(float(p.y-lastPoint.y)/(float(p.x-lastPoint.x))))) > 
+        abs((int(float(p.x-lastPoint.x)/(float(p.y-lastPoint.y))))) )
+        xPlane = false;
+
+    if(abs((int(p.x-lastPoint.x))) != 0 && (xPlane || p.y==lastPoint.y))
     {
         float slope = float(float(p.y-lastPoint.y)/(float(p.x-lastPoint.x)));
         if(lastPoint.x > p.x)

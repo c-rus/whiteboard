@@ -16,7 +16,7 @@ int main()
     sf::Vector2i cord, lastCord, diff;
 
     sf::Color penInk = sf::Color::Black;
-    int penSize = 6;
+    int penSize = 5;
 
     bool pressed, pan, eraser, cmd;
     pressed = pan = eraser = cmd = false;
@@ -75,13 +75,31 @@ int main()
                         }
                     }
                 }
+                else if(e.key.code == sf::Keyboard::Right)
+                {
+                    for(auto it = doodle.begin(); it != doodle.end(); it++)
+                    {
+                        (*it)->zoom(1);
+                    }
+                }
+                else if(e.key.code == sf::Keyboard::Left)
+                {
+                    for(auto it = doodle.begin(); it != doodle.end(); it++)
+                    {
+                        (*it)->zoom(-1);
+                    }
+                }
                 else if(e.key.code == sf::Keyboard::G)
                 {
-                    penInk = sf::Color::Green;
+                    penInk = sf::Color(34,139,34);
                 }
                 else if(e.key.code == sf::Keyboard::B)
                 {
                     penInk = sf::Color::Black;
+                }
+                else if(e.key.code == sf::Keyboard::O)
+                {
+                    penInk = sf::Color(255,125,0);
                 }
                 else if(e.key.code == sf::Keyboard::R)
                 {
