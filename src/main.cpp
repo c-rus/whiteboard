@@ -6,9 +6,14 @@
 #include "squiggle.h"
 #include "stylus.h"
 
+/*
+TODO: key outlooks
+    - draw only top-most pixel (use unordered_map)
+    - draw only visible pixels (not offscreen pixels)
+*/
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(1000, 800), "Whiteboard", sf::Style::None);
+    sf::RenderWindow window(sf::VideoMode(1200, 900), "Whiteboard", sf::Style::None);
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     
