@@ -17,6 +17,7 @@ int main()
 
     sf::Color penInk = sf::Color::Black;
     int penSize = 5;
+    int magnifier = 10;
 
     bool pressed, pan, eraser, cmd;
     pressed = pan = eraser = cmd = false;
@@ -29,21 +30,34 @@ int main()
                 window.close();
             else if(e.type == sf::Event::MouseButtonReleased)
             {
-                pressed = false;
-                pan = false;
+                pressed = pan = false;
             }
             else if(e.type == sf::Event::MouseButtonPressed)
-            {
-                pressed = true;
-                
+            {   
                 cord = sf::Mouse::getPosition(window);
                 lastCord = cord;
                 diff = sf::Vector2i(0,0);
                 //std::cout << cord.x << " " << cord.y << std::endl;
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
-                else
+                else if(!eraser)
+                {
                     doodle.push_back(new Squiggle(cord, penSize, penInk));
+                    pressed = true;
+                }
+            }
+            else if(e.type == sf::Event::MouseWheelMoved)
+            {
+                std::cout << e.mouseWheel.delta << std::endl;
+                cord = sf::Mouse::getPosition(window);
+                magnifier = e.mouseWheel.delta;
+                if(magnifier != 0)
+                {
+                    for(auto it = doodle.begin(); it != doodle.end(); it++)
+                    {
+                        (*it)->zoom(magnifier, cord);
+                    }
+                }
             }
             else if(e.type == sf::Event::KeyPressed)
             {
@@ -73,20 +87,6 @@ int main()
                             reverseDoodle.pop_back();
                             std::cout << "redo squiggle!" << std::endl;
                         }
-                    }
-                }
-                else if(e.key.code == sf::Keyboard::Right)
-                {
-                    for(auto it = doodle.begin(); it != doodle.end(); it++)
-                    {
-                        (*it)->zoom(1);
-                    }
-                }
-                else if(e.key.code == sf::Keyboard::Left)
-                {
-                    for(auto it = doodle.begin(); it != doodle.end(); it++)
-                    {
-                        (*it)->zoom(-1);
                     }
                 }
                 else if(e.key.code == sf::Keyboard::G)
@@ -148,12 +148,12 @@ int main()
             }
         }
 
-        if(pressed && !eraser && !pan)
+        if(pressed && !eraser)
         {
             cord = sf::Mouse::getPosition(window);
             doodle.back()->addPoint(cord, penSize, penInk);
         }
-        else if(pressed && eraser && !pan)
+        else if(pressed)
         {
             //TODO: Fix up erasing
             int eRange = 6;
@@ -173,9 +173,7 @@ int main()
             cord = sf::Mouse::getPosition(window);
             diff = cord - lastCord;
             for(auto it = doodle.begin(); it != doodle.end(); it++)
-            {
                 (*it)->move(diff);
-            }
             lastCord = cord;
         }
 

@@ -20,16 +20,32 @@ void Squiggle::draw(sf::RenderWindow& win)
 }
 
 //TODO: Work on fixing zoom 
-void Squiggle::zoom(int magnify)
+void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
 {
     mag += magnify;
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         auto& l = *it;
-        l->setScale(mag, mag);
-    } 
-    sf::Vector2i v(magnify, magnify);
-    move(v);
+        //l->setScale(mag, mag);
+        sf::Vector2i nextStep = sf::Vector2i(magnify, magnify);
+        if(l->getPosition().x > mPoint.x)
+        {
+            nextStep.x = -nextStep.x;
+        }
+        else if(l->getPosition().x == mPoint.x)
+        {
+            nextStep.x = 0;
+        }
+        if(l->getPosition().y > mPoint.y)
+        {
+            nextStep.y = -nextStep.y;
+        }
+        else if(l->getPosition().y == mPoint.y)
+        {
+            nextStep.y = 0;
+        }
+        l->setPosition(l->getPosition()+sf::Vector2f(nextStep));
+    }
 }
 
 void Squiggle::move(sf::Vector2i& offset)

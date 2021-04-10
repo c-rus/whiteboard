@@ -16,5 +16,5 @@ public:
     void addPoint(sf::Vector2i& p, int size, sf::Color color);
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
-    void zoom(int magnify);
+    void zoom(int magnify, sf::Vector2i& mPoint);
 };
