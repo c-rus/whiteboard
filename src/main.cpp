@@ -7,11 +7,12 @@
 
 int main()
 {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Whiteboard", sf::Style::None);
+    sf::RenderWindow window(sf::VideoMode(1000, 800), "Whiteboard", sf::Style::None);
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     
-    std::list<Squiggle*> artwork;
+    std::list<Squiggle*> doodle;
+    std::list<Squiggle*> reverseDoodle;
     sf::Vector2i cord, lastCord, diff;
 
     sf::Color penInk = sf::Color::Black;
@@ -21,7 +22,6 @@ int main()
     pressed = pan = eraser = cmd = false;
     while(window.isOpen())
     {
-
         sf::Event e;
         while(window.pollEvent(e))
         {
@@ -43,7 +43,7 @@ int main()
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else
-                    artwork.push_back(new Squiggle(cord, penSize, penInk));
+                    doodle.push_back(new Squiggle(cord, penSize, penInk));
             }
             else if(e.type == sf::Event::KeyPressed)
             {
@@ -55,11 +55,23 @@ int main()
                 {
                     if(cmd)
                     {
-                        if(artwork.size() > 0)
+                        if(doodle.size() > 0)
                         {
-                            delete artwork.back();
-                            artwork.pop_back();
+                            reverseDoodle.push_back(doodle.back());
+                            doodle.pop_back();
                             std::cout << "undo squiggle!" << std::endl;
+                        }
+                    }
+                }
+                else if(e.key.code == sf::Keyboard::X)
+                {
+                    if(cmd)
+                    {
+                        if(reverseDoodle.size() > 0)
+                        {
+                            doodle.push_back(reverseDoodle.back());
+                            reverseDoodle.pop_back();
+                            std::cout << "redo squiggle!" << std::endl;
                         }
                     }
                 }
@@ -95,11 +107,17 @@ int main()
                 }
                 else if(e.key.code == sf::Keyboard::C)
                 {
-                    while(artwork.size() > 0)
+                    while(doodle.size() > 0)
                     {
-                        Squiggle* s = artwork.back();
+                        Squiggle* s = doodle.back();
                         delete s;
-                        artwork.pop_back();
+                        doodle.pop_back();
+                    }
+                    while(reverseDoodle.size() > 0)
+                    {
+                        Squiggle* s = reverseDoodle.back();
+                        delete s;
+                        reverseDoodle.pop_back();
                     }
                 }
             }
@@ -115,7 +133,7 @@ int main()
         if(pressed && !eraser && !pan)
         {
             cord = sf::Mouse::getPosition(window);
-            artwork.back()->addPoint(cord, penSize, penInk);
+            doodle.back()->addPoint(cord, penSize, penInk);
         }
         else if(pressed && eraser && !pan)
         {
@@ -136,7 +154,7 @@ int main()
         {
             cord = sf::Mouse::getPosition(window);
             diff = cord - lastCord;
-            for(auto it = artwork.begin(); it != artwork.end(); it++)
+            for(auto it = doodle.begin(); it != doodle.end(); it++)
             {
                 (*it)->move(diff);
             }
@@ -145,17 +163,23 @@ int main()
 
         window.clear(sf::Color::White);
 
-        for(auto it = artwork.begin(); it != artwork.end(); it++)
+        for(auto it = doodle.begin(); it != doodle.end(); it++)
         {
             (*it)->draw(window);
         }
         window.display();
     }
 
-    while(artwork.size() > 0)
+    while(doodle.size() > 0)
     {
-        Squiggle* s = artwork.back();
+        Squiggle* s = doodle.back();
         delete s;
-        artwork.pop_back();
+        doodle.pop_back();
+    }
+    while(reverseDoodle.size() > 0)
+    {
+        Squiggle* s = reverseDoodle.back();
+        delete s;
+        reverseDoodle.pop_back();
     }
 }
