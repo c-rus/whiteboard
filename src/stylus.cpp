@@ -3,12 +3,18 @@
 Stylus::Stylus(int w, sf::Color i)
 {
     ink = i;
+    form = Mode::DRAW;
     width = w;
 }
 
 void Stylus::setInk(sf::Color i)
 {
     ink = i;
+}
+
+void Stylus::swapMode(Mode m)
+{
+    form = m;
 }
 
 void Stylus::setWidth(int w)
@@ -19,6 +25,11 @@ void Stylus::setWidth(int w)
         width = MAX_W;
     else
         width = w;
+}
+
+Stylus::Mode Stylus::getMode()
+{
+    return form;
 }
 
 int Stylus::getWidth()

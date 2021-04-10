@@ -1,8 +1,9 @@
 #include "board.h"
 
-Board::Board()
+Board::Board(int w, int h)
 {
-
+    width = w;
+    height = h;
 }
 
 Board::~Board()
@@ -24,6 +25,11 @@ void Board::pan(sf::Vector2i& offset)
 {
     for(auto it = scribs.begin(); it != scribs.end(); it++)
                 (*it)->move(offset);
+}
+
+void Board::erase(sf::Vector2i& loc, int w)
+{
+
 }
 
 void Board::draw(sf::RenderWindow& win)

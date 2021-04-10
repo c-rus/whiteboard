@@ -21,12 +21,12 @@ int main()
     sf::Vector2i loc, prevLoc, diff;
 
     Stylus pen(5, sf::Color(0,0,0));
-    Board b;
+    Board b(window.getSize().x, window.getSize().y);
 
     int magnifier = 10;
 
-    bool pressed, pan, eraser, cmd;
-    pressed = pan = eraser = cmd = false;
+    bool pressed, pan, cmd;
+    pressed = pan = cmd = false;
     while(window.isOpen())
     {
         sf::Event e;
@@ -40,17 +40,15 @@ int main()
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   
+                pressed = true;
                 loc = sf::Mouse::getPosition(window);
                 prevLoc = loc;
                 diff = sf::Vector2i(0,0);
                 //std::cout << cord.x << " " << cord.y << std::endl;
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
-                else if(!eraser)
-                {
+                else if(pen.getMode() == Stylus::DRAW)
                     b.startSqui(loc, pen.getWidth(), pen.getInk());
-                    pressed = true;
-                }
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
@@ -60,24 +58,9 @@ int main()
             }
             else if(e.type == sf::Event::KeyPressed)
             {
-                if(e.key.code == sf::Keyboard::LSystem)
-                {
-                    cmd = true;
-                }
-                else if(e.key.code == sf::Keyboard::Z)
-                {
-                    if(cmd) //undo
-                        b.undo();
-                }
-                else if(e.key.code == sf::Keyboard::X)
-                {
-                    if(cmd) //redo
-                        b.redo();
-                }
-                else if(e.key.code == sf::Keyboard::W)
-                {
-
-                }
+                if(e.key.code == sf::Keyboard::LSystem) cmd = true;
+                else if(e.key.code == sf::Keyboard::Z && cmd) b.undo();
+                else if(e.key.code == sf::Keyboard::X && cmd) b.redo();
                 else if(e.key.code == sf::Keyboard::G)
                 {
                     pen.setInk(sf::Color(34,139,34));
@@ -108,45 +91,40 @@ int main()
                 }
                 else if(e.key.code == sf::Keyboard::E)
                 {
-                    eraser = !eraser;
+                    pen.swapMode(Stylus::ERASE);
                 }
-                else if(e.key.code == sf::Keyboard::C)
+                else if(e.key.code == sf::Keyboard::D)
                 {
-                    b.clear();
+                    pen.swapMode(Stylus::DRAW);
                 }
+                else if(e.key.code == sf::Keyboard::C) b.clear();
             }
             else if(e.type == sf::Event::KeyReleased)
             {
-                if(e.key.code == sf::Keyboard::LSystem)
-                {
-                    cmd = false;
-                }
+                if(e.key.code == sf::Keyboard::LSystem) cmd = false;
             }
         }
 
         loc = sf::Mouse::getPosition(window);
-        if(pressed && !eraser)
-            b.continueSqui(loc, pen.getWidth(), pen.getInk());
-        else if(pressed)
-        {
-            //TODO: Fix up erasing
-            int eRange = 6;
-            for(int i = -eRange; i <= eRange; i++)
-            {
-                sf::Vector2f tempC = sf::Vector2f(loc);
-                tempC.x+=i;
-                for(int j = -eRange; j <= eRange; j++)
-                {
-                    tempC.y+=j;
-                    std::string cordKey = std::to_string(int(tempC.x)) + "," + std::to_string(int(tempC.y));
-                }
-            }
-        }
-        else if(pan)
+        if(pan)
         {
             diff = loc - prevLoc;
             b.pan(diff);
             prevLoc = loc;
+        }
+        else if(pressed)
+        {
+            switch(pen.getMode())
+            {
+                case Stylus::DRAW:
+                    b.continueSqui(loc, pen.getWidth(), pen.getInk());
+                    break;
+                case Stylus::ERASE:
+                    b.erase(loc, pen.getWidth());
+                    break;
+                default:
+                    std::cout << "ERROR: Unkown mode." << std::endl;
+            }
         }
 
         window.clear(sf::Color::White);
