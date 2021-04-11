@@ -9,6 +9,12 @@ class Board
 private:
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
+    std::list<Squiggle*> visibleScribs;
+    
+    bool refresh;
+    int frameBuffer;
+
+    Box frame;
 
     int width;
     int height;
@@ -33,4 +39,6 @@ public:
     void redo();
     void undo();
     void clear();
+
+    void deassertRefresh();
 };

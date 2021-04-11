@@ -3,12 +3,11 @@
 Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
 {
     points.push(start);
-    mag = 1;
-    this->width = width;
     sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
     lines.push_back(l);
+    bounds = Box(start.x, start.y, width, width);
 }
 
 void Squiggle::draw(sf::RenderWindow& win)
@@ -55,13 +54,14 @@ void Squiggle::move(sf::Vector2i& offset)
         auto& l = *it;
         l->setPosition(l->getPosition()+sf::Vector2f(offset));
     }
+    bounds.shift(offset.x, offset.y);
 }
 
-void Squiggle::addPoint(sf::Vector2i& p, int width, sf::Color color)
+bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
 {
     sf::Vector2f prev = sf::Vector2f(points.top());
     if(prev == sf::Vector2f(p))
-        return;
+        return false;
     //calculate slopes
     float slopeYoverX = 0;
     float slopeXoverY = 0;
@@ -86,10 +86,11 @@ void Squiggle::addPoint(sf::Vector2i& p, int width, sf::Color color)
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
             prev.y+=slopeYoverX;
 
-            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
+            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(w, w));
             l->setFillColor(color);
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
+            bounds.stretch(prev.x+w, prev.y+w);
         }
     }
     //choose y-axis as independent
@@ -100,16 +101,23 @@ void Squiggle::addPoint(sf::Vector2i& p, int width, sf::Color color)
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
             prev.x+=slopeXoverY;
 
-            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
+            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(w, w));
             l->setFillColor(color);
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
+            bounds.stretch(prev.x+w, prev.y+w);
         }
     }
     points.push(p);
+    return true;
 }
 
 int Squiggle::count()
 {
     return lines.size();
+}
+
+Box& Squiggle::getBounds()
+{
+    return bounds;
 }

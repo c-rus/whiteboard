@@ -27,6 +27,8 @@ int main()
     pressed = pan = cmd = false;
     while(window.isOpen())
     {
+        b.deassertRefresh();
+
         sf::Event e;
         while(window.pollEvent(e))
         {
@@ -128,11 +130,10 @@ int main()
                     b.erase(loc, pen.getWidth());
                     break;
                 default:
-                    std::cout << "ERROR: Unkown mode." << std::endl;
+                    std::cout << "ERROR: Unknown mode." << std::endl;
             }
         }
 
-        window.clear(sf::Color::White);
         b.draw(window);
         window.display();
     }
