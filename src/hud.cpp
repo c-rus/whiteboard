@@ -3,6 +3,7 @@
 HUD::HUD(int w, int h)
 {
     knobs.push_back(Clickable(10, 10, 64, 64));
+    inspecting = knobs.end();
     //knobs.push_back(Clickable(w-10-64, 10, 64, 64));
 }
 
@@ -27,10 +28,17 @@ bool HUD::interact(sf::Vector2i& mLoc, Board& b)
     return false;
 }
 
-void HUD::inspect(sf::Vector2i& mLoc)
+bool HUD::inspect(sf::Vector2i& mLoc)
 {
+    auto prevInspect = inspecting;
+    inspecting = knobs.end();
     for(auto it = knobs.begin(); it != knobs.end(); it++)
-        (*it).highlight(mLoc);
+    {
+        if((*it).highlight(mLoc))
+            inspecting = it;
+    }
+    
+    return (prevInspect != inspecting);
 }
 
 void HUD::draw(sf::RenderTexture& surf)

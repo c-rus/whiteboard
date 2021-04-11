@@ -1,7 +1,5 @@
 #include <iostream>
-#include <list>
 #include <SFML/Graphics.hpp>
-#include <unordered_map>
 #include <string>
 #include "squiggle.h"
 #include "stylus.h"
@@ -78,7 +76,8 @@ int main(int argc, char ** argv)
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
                 loc = sf::Mouse::getPosition(window);
-                hud.inspect(loc);
+                if(hud.inspect(loc))
+                    canvas->assertRefresh();
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   

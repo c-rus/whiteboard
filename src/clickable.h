@@ -6,21 +6,24 @@ class Clickable
 {
 private:
     Box bounds;
-    sf::RectangleShape button;
+    sf::Sprite sp;
+    sf::Texture* tx; //fix
 
 public:
     Clickable(int x, int y, int w, int h)
     {
-        button.setPosition(x, y);
-        button.setSize(sf::Vector2f(w, h));
-        button.setFillColor(sf::Color(10,10,10));
+        tx = new sf::Texture();
+        tx->loadFromFile("./assets/reset.png");
+        sp.setTexture(*tx);
+        sp.setPosition(x, y);
+        sp.setTextureRect(sf::IntRect(0, 0, 64, 64));
         bounds = Box(x, y, w, h);
     };
 
     void draw(sf::RenderTexture& surf)
     {
         //TODO: stop drawing every frame, only draw when needing to refresh for opacity look
-        surf.draw(button);
+        surf.draw(sp);
     };
 
     Box& getBounds()
@@ -28,10 +31,16 @@ public:
         return bounds;
     };
 
-    void highlight(sf::Vector2i& mLoc)
+    bool highlight(sf::Vector2i& mLoc)
     {
         Box mouseBounds(mLoc.x, mLoc.y, 0, 0);
-        if (getBounds().contains(mouseBounds)) button.setFillColor(sf::Color(10,255,10));
-        else button.setFillColor(sf::Color(10,10,10)); 
+        if (getBounds().contains(mouseBounds)) 
+        {
+            sp.setTextureRect(sf::IntRect(0, 64, 64, 64));
+            return true;
+        }
+        else 
+            sp.setTextureRect(sf::IntRect(0, 0, 64, 64));
+            return false;
     }
 };

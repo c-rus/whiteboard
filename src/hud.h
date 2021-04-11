@@ -7,6 +7,7 @@ class HUD
 {
 private:
     std::list<Clickable> knobs;
+    std::list<Clickable>::iterator inspecting;
 
 public:
     HUD(int w, int h);
@@ -14,6 +15,6 @@ public:
     
     sf::Sprite getLayer(sf::RenderTexture& surf);
     void resize(int w, int h);
-    void inspect(sf::Vector2i& mLoc);
+    bool inspect(sf::Vector2i& mLoc);
     bool interact(sf::Vector2i& mLoc, Board& b);
 };
