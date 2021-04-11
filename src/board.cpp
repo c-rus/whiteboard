@@ -33,7 +33,7 @@ void Board::pan(sf::Vector2i& offset)
     for(auto it = scribs.begin(); it != scribs.end(); it++)
     {
         (*it)->move(offset);
-        if(frame.contains((*it)->getBounds()))
+        if(frame.intersect((*it)->getBounds()))
             visibleScribs.push_back(*it);
     }
     
@@ -50,7 +50,7 @@ void Board::erase(sf::Vector2i& loc, int w)
     {
         scribs.front()->getBounds().print();
         frame.print();
-        if(frame.contains(scribs.front()->getBounds()))
+        if(frame.intersect(scribs.front()->getBounds()))
             std::cout << "scribble is visible" << std::endl;
         else
             std::cout << "scribble is out of bounds" << std::endl;
@@ -60,8 +60,16 @@ void Board::erase(sf::Vector2i& loc, int w)
 void Board::resize(int w, int h)
 {
     refresh = true;
-    width = w;
-    height = h;
+    if(w > MAX_W)
+        width = MAX_W;
+    else
+        width = w;
+
+    if(h > MAX_H)
+        height = MAX_H;
+    else
+        height = h;
+
     frame = Box(0, 0, width, height);
     std::cout << "WIDTH: " << width << std::endl;
     std::cout << "HEIGHT: " << height << std::endl;
@@ -78,7 +86,7 @@ void Board::draw(sf::RenderWindow& win)
         win.clear(sf::Color::White);
         for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
             (*it)->draw(win); 
-
+        std::cout << visibleScribs.size() << std::endl;
         frameBuffer++;
     }
 

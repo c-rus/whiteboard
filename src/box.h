@@ -60,6 +60,11 @@ public:
 
     bool intersect(Box& rhs)
     {
-        return rhs.contains(*this) || contains(rhs);
+        return (contains(rhs) ||
+                (x >= rhs.x && x+width <= rhs.x+rhs.width && ((rhs.y >= y && rhs.y <= y+height) || 
+                                                              (rhs.y+rhs.height >= y && rhs.y+rhs.height <= y+height))) ||
+                (y >= rhs.y && y+height <= rhs.y+rhs.height && ((rhs.x >= x && rhs.x <= x+width) || 
+                                                              (rhs.x+rhs.width >= x && rhs.x+rhs.width <= x+width)))                                              
+                );
     };
 };

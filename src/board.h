@@ -7,11 +7,11 @@
 class Board
 {
 private:
+    //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
-    //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
-    std::list<Squiggle*> visibleScribs;
     
+    std::list<Squiggle*> visibleScribs;
     bool refresh;
     int frameBuffer;
 
