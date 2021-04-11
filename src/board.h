@@ -38,6 +38,7 @@ public:
 
     //light erase- only erase top-level squiggle components
     //deep erase- erase all-level squiggle components
+    //squi erase- erase the whole squiggle thats in contact with eraser
     void erase(sf::Vector2i& loc, int w);
 
     void resize(int w, int h);

@@ -82,12 +82,12 @@ void Board::draw(sf::RenderWindow& win)
     {
         if(refresh) 
             frameBuffer = 0;
-        std::cout << "refreshing" << frameBuffer << std::endl;
+        std::cout << "refreshing " << frameBuffer << std::endl;
 
         win.clear(sf::Color::White);
         for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
             (*it)->draw(win); 
-        std::cout << visibleScribs.size() << std::endl;
+        std::cout << "Visible scribbles: " << visibleScribs.size() << std::endl;
         frameBuffer++;
     }
 }

@@ -8,6 +8,7 @@
 #include "board.h"
 #include "clickable.h"
 #include "fileManager.h"
+#include "hud.h"
 
 /*
 TODO: key outlooks
@@ -26,13 +27,13 @@ int main(int argc, char ** argv)
         if(i == 1) //try to load this file path
             fileName = std::string(argv[i]);
     }
-    
-    
 
     std::string title = "Whiteboard";
-    sf::RenderWindow window(sf::VideoMode(1200, 900), title);
-    sf::RenderTexture surface;
-    surface.create(window.getSize().x, window.getSize().y);
+    int screenWidth = 1200;
+    int screenHeight = 900;
+    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), title);
+    sf::RenderTexture surf;
+    surf.create(screenWidth, screenHeight);
 
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
@@ -40,9 +41,8 @@ int main(int argc, char ** argv)
 
     Stylus pen(5, sf::Color(0,0,0));
 
-    Board* canvas = fm.load(fileName, window.getSize().x, window.getSize().y);
-
-    Clickable kb(10, 10, 64, 64);
+    Board* canvas = fm.load(fileName, screenWidth, screenHeight);
+    HUD hud(screenWidth, screenHeight);
 
     bool pressed, pan, cmd;
     bool upToDate = true;
@@ -67,8 +67,8 @@ int main(int argc, char ** argv)
             else if(e.type == sf::Event::Resized)
             {
                 sf::FloatRect visibleArea(0, 0, e.size.width, e.size.height);
-                canvas->resize(visibleArea.width, visibleArea.height);
-                surface.create(visibleArea.width, visibleArea.height);
+                canvas->resize(visibleArea.width, visibleArea.height);    
+                surf.create(visibleArea.width, visibleArea.height);
                 window.setView(sf::View(visibleArea));
             }
             else if(e.type == sf::Event::MouseButtonReleased)
@@ -78,19 +78,15 @@ int main(int argc, char ** argv)
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
                 loc = sf::Mouse::getPosition(window);
-                kb.highlight(loc);
+                hud.inspect(loc);
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   
                 
                 loc = sf::Mouse::getPosition(window);
-                Box mouseBounds(loc.x, loc.y, 0, 0);
-                if(kb.getBounds().contains(mouseBounds))
-                {
-                    std::cout << "clicked button!" << std::endl;
-                    canvas->clear();
+                if(hud.interact(loc, *canvas))
                     continue;
-                }
+                
                 pressed = true;
                 prevLoc = loc;
                 diff = sf::Vector2i(0,0);
@@ -156,7 +152,6 @@ int main(int argc, char ** argv)
                     canvas->resize(visibleArea.width, visibleArea.height);
                     window.setSize(sf::Vector2u(newW, newH));
                     window.setView(sf::View(visibleArea));
-                    //window.setPosition(pos);
                     window.setPosition(pos);
                 }
                 else if(e.key.code == sf::Keyboard::Down)
@@ -201,14 +196,10 @@ int main(int argc, char ** argv)
             }
         }
 
-        surface.clear(sf::Color::Transparent);
-        kb.draw(surface);
-        surface.display();
-
+        hud.draw(surf);
         canvas->draw(window);
-
-        sf::Sprite sp = sf::Sprite(surface.getTexture());
-        window.draw(sp);
+        
+        window.draw(hud.getLayer(surf));
         window.display();
     }
 
