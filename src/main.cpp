@@ -92,6 +92,19 @@ int main()
                 {
                     pen.setWidth(pen.getWidth()+1);
                 }
+                else if(e.key.code == sf::Keyboard::A)
+                {
+                    //tests resizing using hot-keys
+                    int newW = sf::VideoMode::getDesktopMode().width;
+                    int newH = sf::VideoMode::getDesktopMode().height;
+                    sf::FloatRect visibleArea(0, 0, newW, newH);
+                    auto pos = window.getPosition();
+                    b.resize(visibleArea.width, visibleArea.height);
+                    window.setSize(sf::Vector2u(newW, newH));
+                    window.setView(sf::View(visibleArea));
+                    //window.setPosition(pos);
+                    window.setPosition(pos);
+                }
                 else if(e.key.code == sf::Keyboard::Down)
                 {
                     pen.setWidth(pen.getWidth()-1);

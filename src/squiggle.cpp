@@ -10,12 +10,19 @@ Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
     bounds = Box(start.x, start.y, width, width);
 }
 
+Squiggle::~Squiggle()
+{
+    while(!lines.empty())
+    {
+        delete lines.back();
+        lines.pop_back();
+    }
+}
+
 void Squiggle::draw(sf::RenderWindow& win)
 {
     for(auto it = lines.begin(); it != lines.end(); it++)
-    {
         win.draw(**it);
-    }
 }
 
 //TODO: Work on fixing zoom 

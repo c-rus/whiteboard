@@ -9,6 +9,7 @@ class Board
 private:
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
+    //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
     std::list<Squiggle*> visibleScribs;
     
     bool refresh;
@@ -33,6 +34,8 @@ public:
 
     void pan(sf::Vector2i& offset);
 
+    //light erase- only erase top-level squiggle components
+    //deep erase- erase all-level squiggle components
     void erase(sf::Vector2i& loc, int w);
 
     void resize(int w, int h);

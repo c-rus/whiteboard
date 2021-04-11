@@ -51,9 +51,9 @@ void Board::erase(sf::Vector2i& loc, int w)
         scribs.front()->getBounds().print();
         frame.print();
         if(frame.contains(scribs.front()->getBounds()))
-            std::cout << "scribble is inside the window" << std::endl;
+            std::cout << "scribble is visible" << std::endl;
         else
-            std::cout << "scribble out of bounds" << std::endl;
+            std::cout << "scribble is out of bounds" << std::endl;
     }
 }
 
@@ -72,9 +72,7 @@ void Board::draw(sf::RenderWindow& win)
     if(refresh || frameBuffer < 2)
     {
         if(refresh) 
-        {
             frameBuffer = 0;
-        }
         std::cout << "refreshing" << frameBuffer << std::endl;
 
         win.clear(sf::Color::White);

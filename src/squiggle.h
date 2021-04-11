@@ -14,6 +14,7 @@ private:
 
 public:
     Squiggle(sf::Vector2i& start, int width, sf::Color color);
+    ~Squiggle();
 
     bool addPoint(sf::Vector2i& p, int width, sf::Color color);
     void draw(sf::RenderWindow&  win);

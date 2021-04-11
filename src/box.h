@@ -23,7 +23,8 @@ public:
 
     void print()
     {
-        std::cout << "x: " << x << " y: " << y << "\t width: " << width << " height:" << height << std::endl; 
+        std::cout << "x: " << x << " y: " << y;
+        std::cout << "\t width: " << width << " height:" << height << std::endl; 
     }
 
     void stretch(int a, int b)
