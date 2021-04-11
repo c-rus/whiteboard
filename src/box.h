@@ -15,6 +15,14 @@ public:
         this->y = y;
     };
 
+    int getWidth() { return width; };
+
+    int getHeight() { return height; };
+
+    int getX() { return x; };
+
+    int getY() { return y; };
+
     void shift(int a, int b)
     {
         x+=a;

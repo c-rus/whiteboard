@@ -2,7 +2,7 @@
 
 Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
 {
-    points.push(start);
+    this->prev = sf::Vector2f(start);
     sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
@@ -66,7 +66,6 @@ void Squiggle::move(sf::Vector2i& offset)
 
 bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
 {
-    sf::Vector2f prev = sf::Vector2f(points.top());
     if(prev == sf::Vector2f(p))
         return false;
     //calculate slopes
@@ -115,7 +114,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
             bounds.stretch(prev.x+w, prev.y+w);
         }
     }
-    points.push(p);
+    prev = sf::Vector2f(p);
     return true;
 }
 
@@ -127,4 +126,85 @@ int Squiggle::count()
 Box& Squiggle::getBounds()
 {
     return bounds;
+}
+
+Squiggle::Squiggle(std::fstream& file)
+{
+    int size = 0;
+    file.read((char*)&size, sizeof(size));
+
+    //what were the bounds?
+    int x = 0;
+    file.read((char*)&x, sizeof(x));
+    int y = 0;
+    file.read((char*)&y, sizeof(y));
+    int w = -1;
+    file.read((char*)&w, sizeof(w));
+    int h = -1;
+    file.read((char*)&h, sizeof(h));
+    bounds = Box(x, y, w, h);
+    
+    for(int i = 0; i < size; i++)
+    {
+        sf::RectangleShape* l = new sf::RectangleShape();
+        //location
+        file.read((char*)&x, sizeof(x));
+        file.read((char*)&y, sizeof(y));
+        //color
+        unsigned char r = 0;
+        unsigned char g = 0;
+        unsigned char b = 0;
+        unsigned char a = 0;
+        file.read((char*)&r, sizeof(r));
+        file.read((char*)&g, sizeof(g));
+        file.read((char*)&b, sizeof(b));
+        file.read((char*)&a, sizeof(a));
+        //width
+        unsigned short width = 0;
+        file.read((char*)&width, sizeof(width));
+
+        l->setPosition(sf::Vector2f(x, y));
+        l->setFillColor(sf::Color(r, g, b, a));
+        l->setSize(sf::Vector2f(width, width));
+        lines.push_back(l);
+    }
+}
+
+void Squiggle::save(std::fstream& file)
+{
+    int size = lines.size();
+    file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
+
+    //save the bounds
+    int temp = bounds.getX();
+    file.write((char*)&temp, sizeof(temp));
+    temp = bounds.getY();
+    file.write((char*)&temp, sizeof(temp));
+    temp = bounds.getWidth();
+    file.write((char*)&temp, sizeof(temp));
+    temp = bounds.getHeight();
+    file.write((char*)&temp, sizeof(temp));
+
+    //save every pixel
+    for(auto it = lines.begin(); it != lines.end(); it++)
+    {
+        sf::RectangleShape* l = *it;
+        //location
+        int x = l->getPosition().x;
+        int y = l->getPosition().y;;
+        file.write((char*)&x, sizeof(x));
+        file.write((char*)&y, sizeof(y));
+        //color
+        unsigned char r = l->getFillColor().r;
+        unsigned char g = l->getFillColor().g;
+        unsigned char b = l->getFillColor().b;
+        unsigned char a = l->getFillColor().a;
+        file.write((char*)&r, sizeof(r));
+        file.write((char*)&g, sizeof(g));
+        file.write((char*)&b, sizeof(b));
+        file.write((char*)&a, sizeof(a));
+        //width
+        unsigned short w = (unsigned short)l->getSize().x;
+        file.write((char*)&w, sizeof(w));
+    }
 }

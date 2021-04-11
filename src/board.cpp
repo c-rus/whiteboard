@@ -1,9 +1,10 @@
 #include "board.h"
 
-Board::Board(int w, int h)
+Board::Board(int w, int h, std::string title)
 {
     width = w;
     height = h;
+    name = title;
     frameBuffer = 0;
     refresh = false;
     frame = Box(0, 0, width, height);
@@ -89,7 +90,6 @@ void Board::draw(sf::RenderWindow& win)
         std::cout << visibleScribs.size() << std::endl;
         frameBuffer++;
     }
-
 }
 
 void Board::clear()
@@ -135,4 +135,43 @@ void Board::undo()
 void Board::deassertRefresh()
 {
     refresh = false;
+}
+
+void Board::assertRefresh()
+{
+    refresh = true;
+}
+
+std::string& Board::getName()
+{
+    return name;
+}
+
+bool Board::isRefreshing()
+{
+    return refresh;
+}
+
+Board::Board(std::fstream& file, int w, int h, std::string title) : Board(w, h, title)
+{
+    int sCount = 0;
+    file.read((char*)&sCount, sizeof(sCount));
+    for(int i = 0; i < sCount; i++)
+    {
+        scribs.push_back(new Squiggle(file));
+        if(frame.contains(scribs.back()->getBounds()))
+            visibleScribs.push_back(scribs.back());
+    }
+}
+
+void Board::save(std::fstream& file)
+{
+    //how many squiggles?
+    int sCount = scribs.size();
+    file.write((char*)&sCount, sizeof(sCount));
+    //write all squiggles
+    for(auto it = scribs.begin(); it != scribs.end(); it++)
+    {
+        (*it)->save(file);
+    }
 }

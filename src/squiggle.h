@@ -3,17 +3,19 @@
 #include <list>
 #include <SFML/Graphics.hpp>
 #include "box.h"
+#include <fstream>
 
 //a squiggle is made from a pair of points, with lines drawn from each successive pair
 class Squiggle
 {
 private:
-    std::stack<sf::Vector2i> points;
+    sf::Vector2f prev;
     std::list<sf::RectangleShape*> lines;
     Box bounds;
 
 public:
     Squiggle(sf::Vector2i& start, int width, sf::Color color);
+    Squiggle(std::fstream& file); //loading from file
     ~Squiggle();
 
     bool addPoint(sf::Vector2i& p, int width, sf::Color color);
@@ -23,4 +25,5 @@ public:
     int count();
 
     Box& getBounds();
+    void save(std::fstream& file);
 };

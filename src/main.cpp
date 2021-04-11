@@ -6,7 +6,8 @@
 #include "squiggle.h"
 #include "stylus.h"
 #include "board.h"
-#include "knob.h"
+#include "clickable.h"
+#include "fileManager.h"
 
 /*
 TODO: key outlooks
@@ -14,25 +15,49 @@ TODO: key outlooks
     - draw only visible pixels (not offscreen pixels)
     -everytime things are moved, try to fit into board's array (start with top squiggles)
 */
-int main()
+int main(int argc, char ** argv)
 {
-    sf::RenderWindow window(sf::VideoMode(1200, 900), "Whiteboard");
+    std::string path = "./";
+    FileManager fm(path);
+
+    std::string fileName = "";
+    for(int i = 0; i < argc; i++)
+    {
+        if(i == 1) //try to load this file path
+            fileName = std::string(argv[i]);
+    }
+    
+    
+
+    std::string title = "Whiteboard";
+    sf::RenderWindow window(sf::VideoMode(1200, 900), title);
     sf::RenderTexture surface;
     surface.create(window.getSize().x, window.getSize().y);
+
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     sf::Vector2i loc, prevLoc, diff;
 
     Stylus pen(5, sf::Color(0,0,0));
-    Board canvas(window.getSize().x, window.getSize().y);
-    
-    Knob kb(10, 10, 64, 64);
+
+    Board* canvas = fm.load(fileName, window.getSize().x, window.getSize().y);
+
+    Clickable kb(10, 10, 64, 64);
 
     bool pressed, pan, cmd;
+    bool upToDate = true;
     pressed = pan = cmd = false;
     while(window.isOpen())
     {
-        canvas.deassertRefresh();
+        if(canvas->isRefreshing())
+            upToDate = false;
+            
+        canvas->deassertRefresh();
+
+        if(!upToDate)
+            window.setTitle(canvas->getName() + "* - " + title);
+        else
+            window.setTitle(canvas->getName() + " - " + title);
 
         sf::Event e;
         while(window.pollEvent(e))
@@ -42,7 +67,7 @@ int main()
             else if(e.type == sf::Event::Resized)
             {
                 sf::FloatRect visibleArea(0, 0, e.size.width, e.size.height);
-                canvas.resize(visibleArea.width, visibleArea.height);
+                canvas->resize(visibleArea.width, visibleArea.height);
                 surface.create(visibleArea.width, visibleArea.height);
                 window.setView(sf::View(visibleArea));
             }
@@ -50,7 +75,7 @@ int main()
             {
                 pressed = pan = false;
             }
-            else if(e.type == sf::Event::MouseMoved)
+            else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
                 loc = sf::Mouse::getPosition(window);
                 kb.highlight(loc);
@@ -63,7 +88,7 @@ int main()
                 if(kb.getBounds().contains(mouseBounds))
                 {
                     std::cout << "clicked button!" << std::endl;
-                    canvas.clear();
+                    canvas->clear();
                     continue;
                 }
                 pressed = true;
@@ -73,20 +98,30 @@ int main()
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else if(pen.getMode() == Stylus::DRAW)
-                    canvas.startSqui(loc, pen.getWidth(), pen.getInk());
+                    canvas->startSqui(loc, pen.getWidth(), pen.getInk());
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
                 //std::cout << e.mouseWheel.delta << std::endl;
                 loc = sf::Mouse::getPosition(window);
                 sf::Vector2i scrollPace(0, e.mouseWheel.delta*4);
-                canvas.pan(scrollPace);
+                canvas->pan(scrollPace);
             }
             else if(e.type == sf::Event::KeyPressed)
             {
                 if(e.key.code == sf::Keyboard::LSystem) cmd = true;
-                else if(e.key.code == sf::Keyboard::Z && cmd) canvas.undo();
-                else if(e.key.code == sf::Keyboard::X && cmd) canvas.redo();
+                else if(e.key.code == sf::Keyboard::Z && cmd) canvas->undo();
+                else if(e.key.code == sf::Keyboard::X && cmd) canvas->redo();
+                else if(e.key.code == sf::Keyboard::S && cmd) 
+                {
+                    if(fm.save(*canvas))
+                    {
+                        std::cout << "Save successful!" << std::endl;
+                        upToDate = true;
+                    }
+                    else
+                        std::cout << "Save failed!" << std::endl;
+                }
                 else if(e.key.code == sf::Keyboard::G)
                 {
                     pen.setInk(sf::Color(34,139,34));
@@ -118,7 +153,7 @@ int main()
                     int newH = sf::VideoMode::getDesktopMode().height;
                     sf::FloatRect visibleArea(0, 0, newW, newH);
                     auto pos = window.getPosition();
-                    canvas.resize(visibleArea.width, visibleArea.height);
+                    canvas->resize(visibleArea.width, visibleArea.height);
                     window.setSize(sf::Vector2u(newW, newH));
                     window.setView(sf::View(visibleArea));
                     //window.setPosition(pos);
@@ -136,7 +171,7 @@ int main()
                 {
                     pen.swapMode(Stylus::DRAW);
                 }
-                else if(e.key.code == sf::Keyboard::C) canvas.clear();
+                else if(e.key.code == sf::Keyboard::C) canvas->clear();
             }
             else if(e.type == sf::Event::KeyReleased)
             {
@@ -148,7 +183,7 @@ int main()
         if(pan)
         {
             diff = loc - prevLoc;
-            canvas.pan(diff);
+            canvas->pan(diff);
             prevLoc = loc;
         }
         else if(pressed)
@@ -156,10 +191,10 @@ int main()
             switch(pen.getMode())
             {
                 case Stylus::DRAW:
-                    canvas.continueSqui(loc, pen.getWidth(), pen.getInk());
+                    canvas->continueSqui(loc, pen.getWidth(), pen.getInk());
                     break;
                 case Stylus::ERASE:
-                    canvas.erase(loc, pen.getWidth());
+                    canvas->erase(loc, pen.getWidth());
                     break;
                 default:
                     std::cout << "ERROR: Unknown mode." << std::endl;
@@ -170,12 +205,12 @@ int main()
         kb.draw(surface);
         surface.display();
 
-        canvas.draw(window);
+        canvas->draw(window);
 
         sf::Sprite sp = sf::Sprite(surface.getTexture());
         window.draw(sp);
         window.display();
-
-        
     }
+
+    delete canvas;
 }

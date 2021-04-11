@@ -10,6 +10,7 @@ private:
     //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
+    std::string name;
     
     std::list<Squiggle*> visibleScribs;
     bool refresh;
@@ -24,7 +25,8 @@ private:
     const int MAX_H = sf::VideoMode::getDesktopMode().height;
 
 public:
-    Board(int w, int h);
+    Board(int w, int h, std::string title="untitled");
+    Board(std::fstream& file, int w, int h, std::string title); //loading a board
     ~Board();
 
     void startSqui(sf::Vector2i& loc, int w, sf::Color i);
@@ -44,4 +46,10 @@ public:
     void clear();
 
     void deassertRefresh();
+    void assertRefresh();
+    bool isRefreshing();
+
+    std::string& getName();
+
+    void save(std::fstream& file);
 };
