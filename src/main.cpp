@@ -139,9 +139,9 @@ int main(int argc, char ** argv)
                 int direction = (e.mouseWheel.delta < 0) ? -1 : 1;
                 if(lastSpeed != 0 && lastSpeed/abs(lastSpeed) != direction)
                     direction = -direction;
-                int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta + 4*e.mouseWheel.delta + 1*direction;
-
-                std::cout << pace << std::endl;
+                //int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta + 4*e.mouseWheel.delta + 1*direction;
+                int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta;
+                //std::cout << pace << std::endl;
                 scrollPaces.push(pace);
             }
             else if(e.type == sf::Event::KeyPressed)
