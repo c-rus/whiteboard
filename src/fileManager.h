@@ -12,5 +12,5 @@ public:
     FileManager(std::string& workDir);
 
     Board* load(std::string& fname, int w, int h);
-    bool save(Board& b);
+    bool save(Board& b, bool force=false);
 };

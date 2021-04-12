@@ -4,4 +4,4 @@ build:
 
 .PHONY: run
 run:
-	./build/whiteboard ./build/scratchpad.wb
+	./build/whiteboard

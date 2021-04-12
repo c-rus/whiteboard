@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <queue>
 #include "squiggle.h"
 #include "stylus.h"
 #include "board.h"
@@ -11,12 +12,11 @@
 /*
 TODO: key outlooks
     - draw only top-most pixel (use unordered_map or array)
-    - draw only visible pixels (not offscreen pixels)
     -everytime things are moved, try to fit into board's array (start with top squiggles)
 */
 int main(int argc, char ** argv)
 {
-    std::string path = "./";
+    std::string path = "./build/";
     FileManager fm(path);
 
     std::string fileName = "";
@@ -30,19 +30,29 @@ int main(int argc, char ** argv)
     int screenWidth = 1200;
     int screenHeight = 900;
     sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), title);
+    sf::Image icn;
+    icn.loadFromFile("./assets/icon.png");
+    window.setIcon(32, 32, icn.getPixelsPtr());
     sf::RenderTexture surf;
     surf.create(screenWidth, screenHeight);
 
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     sf::Vector2i loc, prevLoc, diff;
+    std::queue<int> scrollPaces;
+    int lastSpeed = 0;
 
-    Stylus pen(5, sf::Color(0,0,0));
+    std::string name = "";
+    std::string alert = "";
+    bool capsLock = false;
+
+    Stylus pen(4, sf::Color(0,0,0));
 
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);
     HUD hud(screenWidth, screenHeight);
 
     bool pressed, pan, cmd;
+    bool askforTitle = false;
     bool upToDate = true;
     pressed = pan = cmd = false;
     while(window.isOpen())
@@ -53,7 +63,7 @@ int main(int argc, char ** argv)
         canvas->deassertRefresh();
 
         if(!upToDate)
-            window.setTitle(canvas->getName() + "* - " + title);
+            window.setTitle(canvas->getName() + "* - " + title + alert);
         else
             window.setTitle(canvas->getName() + " - " + title);
 
@@ -62,6 +72,31 @@ int main(int argc, char ** argv)
         {
             if(e.type == sf::Event::Closed)
                 window.close();
+            else if(askforTitle && e.type == sf::Event::KeyPressed)
+            {
+                if(e.key.code == sf::Keyboard::LShift || e.key.code == sf::Keyboard::RShift)
+                    capsLock = true;
+                else if(e.key.code == sf::Keyboard::BackSpace && !name.empty())
+                    name.pop_back();
+                else if(e.key.code == sf::Keyboard::Enter && !name.empty())
+                {
+                    askforTitle = false;
+                    alert = "";
+                    upToDate = fm.save(*canvas, true);
+                }
+                else if(e.key.code >= sf::Keyboard::A && e.key.code <= sf::Keyboard::Z)
+                {
+                    int offset = (capsLock) ? 65 : 97; 
+                    name.push_back(char((e.key.code)+offset));
+                }
+                else if(e.key.code >= sf::Keyboard::Num0 && e.key.code <= sf::Keyboard::Num9)
+                {
+                    int offset = 22;
+                    name.push_back(char((e.key.code)+offset));
+                }
+                
+                canvas->setName(name);
+            }
             else if(e.type == sf::Event::Resized)
             {
                 sf::FloatRect visibleArea(0, 0, e.size.width, e.size.height);
@@ -81,7 +116,6 @@ int main(int argc, char ** argv)
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   
-                
                 loc = sf::Mouse::getPosition(window);
                 if(hud.interact(loc, *canvas))
                     continue;
@@ -97,10 +131,14 @@ int main(int argc, char ** argv)
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
-                //std::cout << e.mouseWheel.delta << std::endl;
-                loc = sf::Mouse::getPosition(window);
-                sf::Vector2i scrollPace(0, e.mouseWheel.delta*4);
-                canvas->pan(scrollPace);
+                //TODO: Smoother scrolling
+                int direction = (e.mouseWheel.delta < 0) ? -1 : 1;
+                if(lastSpeed != 0 && lastSpeed/abs(lastSpeed) != direction)
+                    direction = -direction;
+                int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta + 4*e.mouseWheel.delta + 1*direction;
+
+                std::cout << pace << std::endl;
+                scrollPaces.push(pace);
             }
             else if(e.type == sf::Event::KeyPressed)
             {
@@ -109,17 +147,21 @@ int main(int argc, char ** argv)
                 else if(e.key.code == sf::Keyboard::X && cmd) canvas->redo();
                 else if(e.key.code == sf::Keyboard::S && cmd) 
                 {
-                    if(fm.save(*canvas))
+                    askforTitle = !fm.save(*canvas);
+                    if(!askforTitle)
                     {
                         std::cout << "Save successful!" << std::endl;
                         upToDate = true;
                     }
                     else
+                    {
+                        alert = " (Type a name to save...)";
                         std::cout << "Save failed!" << std::endl;
+                    }
                 }
                 else if(e.key.code == sf::Keyboard::G)
                 {
-                    pen.setInk(sf::Color(34,139,34));
+                    pen.setInk(sf::Color(34,200,34));
                 }
                 else if(e.key.code == sf::Keyboard::B)
                 {
@@ -141,18 +183,6 @@ int main(int argc, char ** argv)
                 {
                     pen.setWidth(pen.getWidth()+1);
                 }
-                else if(e.key.code == sf::Keyboard::A)
-                {
-                    //tests resizing using hot-keys
-                    int newW = sf::VideoMode::getDesktopMode().width;
-                    int newH = sf::VideoMode::getDesktopMode().height;
-                    sf::FloatRect visibleArea(0, 0, newW, newH);
-                    auto pos = window.getPosition();
-                    canvas->resize(visibleArea.width, visibleArea.height);
-                    window.setSize(sf::Vector2u(newW, newH));
-                    window.setView(sf::View(visibleArea));
-                    window.setPosition(pos);
-                }
                 else if(e.key.code == sf::Keyboard::Down)
                 {
                     pen.setWidth(pen.getWidth()-1);
@@ -170,15 +200,31 @@ int main(int argc, char ** argv)
             else if(e.type == sf::Event::KeyReleased)
             {
                 if(e.key.code == sf::Keyboard::LSystem) cmd = false;
+
+                if(e.key.code == sf::Keyboard::LShift || 
+                   e.key.code == sf::Keyboard::RShift) capsLock = false;
             }
         }
 
+        hud.update();
+
         loc = sf::Mouse::getPosition(window);
-        if(pan)
+        if(pan || !scrollPaces.empty())
         {
-            diff = loc - prevLoc;
-            canvas->pan(diff);
-            prevLoc = loc;
+            if(!scrollPaces.empty())
+            {
+                lastSpeed = scrollPaces.front();
+                scrollPaces.pop(); 
+                sf::Vector2i scrollPace(0, lastSpeed);
+                canvas->pan(scrollPace);  
+            }
+            else
+            {
+                diff = loc - prevLoc;
+                canvas->pan(diff);
+                prevLoc = loc;
+            }
+
         }
         else if(pressed)
         {

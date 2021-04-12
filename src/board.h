@@ -25,7 +25,7 @@ private:
     const int MAX_H = sf::VideoMode::getDesktopMode().height;
 
 public:
-    Board(int w, int h, std::string title="untitled");
+    Board(int w, int h, std::string title="");
     Board(std::fstream& file, int w, int h, std::string title); //loading a board
     ~Board();
 
@@ -51,6 +51,7 @@ public:
     bool isRefreshing();
 
     std::string& getName();
+    void setName(std::string& n);
 
     void save(std::fstream& file);
 };

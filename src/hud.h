@@ -8,9 +8,12 @@ class HUD
 private:
     std::list<Clickable> knobs;
     std::list<Clickable>::iterator inspecting;
+    int counter;
+    int delay = 80;
 
 public:
     HUD(int w, int h);
+    void update();
     void draw(sf::RenderTexture& surf);
     
     sf::Sprite getLayer(sf::RenderTexture& surf);

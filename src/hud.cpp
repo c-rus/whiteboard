@@ -4,6 +4,7 @@ HUD::HUD(int w, int h)
 {
     knobs.push_back(Clickable(10, 10, 64, 64));
     inspecting = knobs.end();
+    counter = 0;
     //knobs.push_back(Clickable(w-10-64, 10, 64, 64));
 }
 
@@ -28,6 +29,21 @@ bool HUD::interact(sf::Vector2i& mLoc, Board& b)
     return false;
 }
 
+void HUD::update()
+{
+    if(inspecting != knobs.end())
+    {
+        counter++;
+        if(counter >= delay)
+        {
+            if(counter == delay)
+                (*inspecting).showToolTip();
+        }
+    }
+    else
+        counter = 0;  
+}
+
 bool HUD::inspect(sf::Vector2i& mLoc)
 {
     auto prevInspect = inspecting;
@@ -37,7 +53,7 @@ bool HUD::inspect(sf::Vector2i& mLoc)
         if((*it).highlight(mLoc))
             inspecting = it;
     }
-    
+
     return (prevInspect != inspecting);
 }
 
