@@ -10,7 +10,7 @@ class Squiggle
 {
 private:
     sf::Vector2f prev;
-    std::list<sf::RectangleShape*> lines;
+    std::list<sf::CircleShape*> lines;
     Box bounds;
 
 public:

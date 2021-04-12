@@ -3,7 +3,7 @@
 Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
 {
     this->prev = sf::Vector2f(start);
-    sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(width, width));
+    sf::CircleShape* l = new sf::CircleShape(width);
     l->setFillColor(color);
     l->setPosition(sf::Vector2f(start));
     lines.push_back(l);
@@ -92,7 +92,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
             prev.y+=slopeYoverX;
 
-            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(w, w));
+            sf::CircleShape* l = new sf::CircleShape(w);
             l->setFillColor(color);
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
@@ -107,7 +107,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
             prev.x+=slopeXoverY;
 
-            sf::RectangleShape* l = new sf::RectangleShape(sf::Vector2f(w, w));
+            sf::CircleShape* l = new sf::CircleShape(w);
             l->setFillColor(color);
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
@@ -146,7 +146,7 @@ Squiggle::Squiggle(std::fstream& file)
     
     for(int i = 0; i < size; i++)
     {
-        sf::RectangleShape* l = new sf::RectangleShape();
+        sf::CircleShape* l = new sf::CircleShape();
         //location
         file.read((char*)&x, sizeof(x));
         file.read((char*)&y, sizeof(y));
@@ -165,7 +165,7 @@ Squiggle::Squiggle(std::fstream& file)
 
         l->setPosition(sf::Vector2f(x, y));
         l->setFillColor(sf::Color(r, g, b, a));
-        l->setSize(sf::Vector2f(width, width));
+        l->setRadius(width);
         lines.push_back(l);
     }
 }
@@ -188,7 +188,7 @@ void Squiggle::save(std::fstream& file)
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        sf::RectangleShape* l = *it;
+        sf::CircleShape* l = *it;
         //location
         int x = l->getPosition().x;
         int y = l->getPosition().y;;
@@ -204,7 +204,7 @@ void Squiggle::save(std::fstream& file)
         file.write((char*)&b, sizeof(b));
         file.write((char*)&a, sizeof(a));
         //width
-        unsigned short w = (unsigned short)l->getSize().x;
+        unsigned short w = (unsigned short)l->getRadius();
         file.write((char*)&w, sizeof(w));
     }
 }
