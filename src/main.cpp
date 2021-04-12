@@ -13,7 +13,7 @@
 TODO: key outlooks
     - draw only top-most pixel (use unordered_map or array)
     - open recent option (save settings to a file thats read on startup)
-    - eraser feature
+    - eraser feature (eraser is just drawing with the background color)
     -everytime things are moved, try to fit into board's array (start with top squiggles)
 */
 int main(int argc, char ** argv)
@@ -130,6 +130,8 @@ int main(int argc, char ** argv)
                     pan = true;
                 else if(pen.getMode() == Stylus::DRAW)
                     canvas->startSqui(loc, pen.getWidth(), pen.getInk());
+                else if(pen.getMode() == Stylus::ERASE)
+                    canvas->startSqui(loc, pen.getWidth(), sf::Color::White);
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
@@ -236,7 +238,8 @@ int main(int argc, char ** argv)
                     canvas->continueSqui(loc, pen.getWidth(), pen.getInk());
                     break;
                 case Stylus::ERASE:
-                    canvas->erase(loc, pen.getWidth());
+                    canvas->continueSqui(loc, pen.getWidth(), sf::Color::White);
+                    //canvas->erase(loc, pen.getWidth());
                     break;
                 default:
                     std::cout << "ERROR: Unknown mode." << std::endl;
