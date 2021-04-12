@@ -12,6 +12,8 @@
 /*
 TODO: key outlooks
     - draw only top-most pixel (use unordered_map or array)
+    - open recent option (save settings to a file thats read on startup)
+    - eraser feature
     -everytime things are moved, try to fit into board's array (start with top squiggles)
 */
 int main(int argc, char ** argv)
