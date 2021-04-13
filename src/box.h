@@ -35,17 +35,20 @@ public:
         std::cout << "\t width: " << width << " height:" << height << std::endl; 
     }
 
-    void stretch(int a, int b)
+    bool stretch(int a, int b)
     {
+        bool triggered = false;
         if(a < x)
         {
             int diff = x-a;
             x = a;
             width = width+diff;
+            triggered = true;
         }  
         else if(a > x+width)
         {
             width = a-x;
+            triggered = true;
         }
 
         if(b < y)
@@ -53,11 +56,15 @@ public:
             int diff = y-b;
             y = b;
             height = height+diff;
+            triggered = true;
         }
         else if(b > y+height)
         {
             height = b-y;
+            triggered = true;
         }
+
+        return triggered;
     }
 
     bool contains(Box& rhs)

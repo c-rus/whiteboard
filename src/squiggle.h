@@ -13,7 +13,14 @@ class Squiggle
 private:
     sf::Vector2f prev;
     std::list<Pixel*> lines;
+    sf::RenderTexture* rt = nullptr;
+    sf::Sprite* sp = nullptr;
     Box bounds;
+    bool optimized;
+    //goal:
+    //1- create the render texture
+    //2- draw pixels to render texture
+    //2- once done drawing pixels -> (call display()) -> store the getTexture() in a sprite
 
 public:
     Squiggle(sf::Vector2i& start, int width, Color color);
@@ -25,6 +32,7 @@ public:
     void move(sf::Vector2i& offset);
     void zoom(int magnify, sf::Vector2i& mPoint);
     int count();
+    void compress();
 
     Box& getBounds();
     void save(std::fstream& file);

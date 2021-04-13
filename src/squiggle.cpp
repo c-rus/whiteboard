@@ -4,7 +4,8 @@ Squiggle::Squiggle(sf::Vector2i& start, int width, Color c)
 {
     this->prev = sf::Vector2f(start);
     lines.push_back(new Pixel(prev, width, c));
-    bounds = Box(start.x, start.y, width, width);
+    bounds = Box(start.x, start.y, width*2, width*2);
+    optimized = false;
 }
 
 Squiggle::~Squiggle()
@@ -14,12 +15,19 @@ Squiggle::~Squiggle()
         delete lines.back();
         lines.pop_back();
     }
+    delete rt;
+    delete sp;
 }
 
 void Squiggle::draw(sf::RenderWindow& win)
 {
-    for(auto it = lines.begin(); it != lines.end(); it++)
-        win.draw((*it)->getDot());
+    if(optimized)
+        win.draw(*sp);
+    else
+    {
+        for(auto it = lines.begin(); it != lines.end(); it++)
+            win.draw((*it)->getDot());
+    }
 }
 
 //TODO: Work on fixing zoom 
@@ -30,12 +38,35 @@ void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
 
 void Squiggle::move(sf::Vector2i& offset)
 {
-    for(auto it = lines.begin(); it != lines.end(); it++)
+    if(optimized)
+        sp->setPosition(sp->getPosition()+sf::Vector2f(offset));
+    else
     {
-        auto& l = (*it)->getDot();
-        l.setPosition(l.getPosition()+sf::Vector2f(offset));
+        for(auto it = lines.begin(); it != lines.end(); it++)
+        {
+            auto& l = (*it)->getDot();
+            l.setPosition(l.getPosition()+sf::Vector2f(offset));
+        }
     }
     bounds.shift(offset.x, offset.y);
+}
+
+void Squiggle::compress()
+{
+    rt = new sf::RenderTexture();
+    rt->create(bounds.getWidth(), bounds.getHeight());
+    rt->clear(Color(0,0,0,0).getSFColor());
+    for(auto it = lines.begin(); it != lines.end(); it++)
+    {
+        auto& d = (*it)->getDot();
+        d.setPosition(d.getPosition()-sf::Vector2f(bounds.getX(), bounds.getY()));
+        rt->draw(d);
+    }
+    rt->display();
+    sp = new sf::Sprite();
+    sp->setTexture(rt->getTexture());
+    sp->setPosition(bounds.getX(), bounds.getY());
+    optimized = true;
 }
 
 bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
@@ -63,11 +94,16 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
     {
         while(prev.x != p.x)
         {
+            bool headedRight = (prev.x < p.x);
+            bool headedDown =  (prev.y < p.y);
+
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
             prev.y += slopeYoverX;
 
             lines.push_back(new Pixel(prev, w, c));
-            bounds.stretch(prev.x+w, prev.y+w);
+            int borderX = (headedRight) ? prev.x+(2*w) : prev.x;
+            int borderY = (headedDown) ? prev.y+(2*w) : prev.y;
+            bounds.stretch(borderX, borderY);
         }
     }
     //choose y-axis as independent
@@ -75,13 +111,19 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
     {
         while(prev.y != p.y)
         {
+            bool headedDown = (prev.y < p.y);
+            bool headedRight = (prev.x < p.x);
+
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
             prev.x += slopeXoverY;
 
             lines.push_back(new Pixel(prev, w, c));
-            bounds.stretch(prev.x+w, prev.y+w);
+            int borderY = (headedDown) ? prev.y+(2*w) : prev.y;
+            int borderX = (headedRight) ? prev.x+(2*w) : prev.x;
+            bounds.stretch(borderX, borderY);
         }
     }
+
     prev = sf::Vector2f(p);
     return true;
 }

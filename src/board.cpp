@@ -27,6 +27,12 @@ void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
     refresh = refresh || scribs.back()->addPoint(loc, w, c);
 }
 
+void Board::compressSqui()
+{
+    scribs.back()->compress();
+    refresh = true;
+}
+
 void Board::pan(sf::Vector2i& offset)
 {
     refresh = true;

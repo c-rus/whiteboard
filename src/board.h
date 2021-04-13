@@ -29,6 +29,7 @@ public:
 
     void startSqui(sf::Vector2i& loc, int w, Color c);
     void continueSqui(sf::Vector2i& loc, int w, Color c);
+    void compressSqui();
 
     void draw(sf::RenderWindow& win);
 
