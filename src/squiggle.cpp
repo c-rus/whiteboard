@@ -3,10 +3,7 @@
 Squiggle::Squiggle(sf::Vector2i& start, int width, Color c)
 {
     this->prev = sf::Vector2f(start);
-    sf::CircleShape* l = new sf::CircleShape(width);
-    l->setFillColor(c.getSFColor());
-    l->setPosition(sf::Vector2f(start));
-    lines.push_back(l);
+    lines.push_back(new Pixel(prev, width, c));
     bounds = Box(start.x, start.y, width, width);
 }
 
@@ -22,44 +19,21 @@ Squiggle::~Squiggle()
 void Squiggle::draw(sf::RenderWindow& win)
 {
     for(auto it = lines.begin(); it != lines.end(); it++)
-        win.draw(**it);
+        win.draw((*it)->self());
 }
 
 //TODO: Work on fixing zoom 
 void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
 {
-    for(auto it = lines.begin(); it != lines.end(); it++)
-    {
-        auto& l = *it;
-        //l->setScale(mag, mag);
-        sf::Vector2i nextStep = sf::Vector2i(magnify, magnify);
-        if(l->getPosition().x > mPoint.x)
-        {
-            nextStep.x = -nextStep.x;
-        }
-        else if(l->getPosition().x == mPoint.x)
-        {
-            nextStep.x = 0;
-        }
-        if(l->getPosition().y > mPoint.y)
-        {
-            nextStep.y = -nextStep.y;
-        }
-        else if(l->getPosition().y == mPoint.y)
-        {
-            nextStep.y = 0;
-        }
-        
-        l->setPosition(l->getPosition()+sf::Vector2f(nextStep));
-    }
+    
 }
 
 void Squiggle::move(sf::Vector2i& offset)
 {
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        auto& l = *it;
-        l->setPosition(l->getPosition()+sf::Vector2f(offset));
+        auto l = (*it)->self();
+        l.setPosition(l.getPosition()+sf::Vector2f(offset));
     }
     bounds.shift(offset.x, offset.y);
 }
@@ -92,10 +66,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
             prev.y+=slopeYoverX;
 
-            sf::CircleShape* l = new sf::CircleShape(w);
-            l->setFillColor(c.getSFColor());
-            l->setPosition(sf::Vector2f(prev));
-            lines.push_back(l);
+            lines.push_back(new Pixel(prev, w, c));
             bounds.stretch(prev.x+w, prev.y+w);
         }
     }
@@ -107,10 +78,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
             prev.x+=slopeXoverY;
 
-            sf::CircleShape* l = new sf::CircleShape(w);
-            l->setFillColor(c.getSFColor());
-            l->setPosition(sf::Vector2f(prev));
-            lines.push_back(l);
+            lines.push_back(new Pixel(prev, w, c));
             bounds.stretch(prev.x+w, prev.y+w);
         }
     }
@@ -146,7 +114,7 @@ Squiggle::Squiggle(std::fstream& file)
     
     for(int i = 0; i < size; i++)
     {
-        sf::CircleShape* l = new sf::CircleShape();
+        Pixel* p = new Pixel();
         //location
         file.read((char*)&x, sizeof(x));
         file.read((char*)&y, sizeof(y));
@@ -163,10 +131,10 @@ Squiggle::Squiggle(std::fstream& file)
         unsigned short width = 0;
         file.read((char*)&width, sizeof(width));
 
-        l->setPosition(sf::Vector2f(x, y));
-        l->setFillColor(sf::Color(r, g, b, a));
-        l->setRadius(width);
-        lines.push_back(l);
+        p->self().setPosition(sf::Vector2f(x, y));
+        p->self().setFillColor(sf::Color(r, g, b, a));
+        p->self().setRadius(width);
+        lines.push_back(p);
     }
 }
 
@@ -188,23 +156,23 @@ void Squiggle::save(std::fstream& file)
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        sf::CircleShape* l = *it;
+        auto l = (*it)->self();
         //location
-        int x = l->getPosition().x;
-        int y = l->getPosition().y;;
+        int x = l.getPosition().x;
+        int y = l.getPosition().y;;
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(y));
         //color
-        unsigned char r = l->getFillColor().r;
-        unsigned char g = l->getFillColor().g;
-        unsigned char b = l->getFillColor().b;
-        unsigned char a = l->getFillColor().a;
+        unsigned char r = l.getFillColor().r;
+        unsigned char g = l.getFillColor().g;
+        unsigned char b = l.getFillColor().b;
+        unsigned char a = l.getFillColor().a;
         file.write((char*)&r, sizeof(r));
         file.write((char*)&g, sizeof(g));
         file.write((char*)&b, sizeof(b));
         file.write((char*)&a, sizeof(a));
         //width
-        unsigned short w = (unsigned short)l->getRadius();
+        unsigned short w = (unsigned short)l.getRadius();
         file.write((char*)&w, sizeof(w));
     }
 }

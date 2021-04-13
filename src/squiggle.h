@@ -5,13 +5,14 @@
 #include "color.h"
 #include "box.h"
 #include <fstream>
+#include "pixel.h"
 
 //a squiggle is made from a pair of points, with lines drawn from each successive pair
 class Squiggle
 {
 private:
     sf::Vector2f prev;
-    std::list<sf::CircleShape*> lines;
+    std::list<Pixel*> lines;
     Box bounds;
 
 public:
