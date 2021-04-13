@@ -1,15 +1,15 @@
 #include "stylus.h"
 
-Stylus::Stylus(int w, sf::Color i)
+Stylus::Stylus(int w, Color c)
 {
-    ink = i;
+    ink = c;
     form = Mode::DRAW;
     width = w;
 }
 
-void Stylus::setInk(sf::Color i)
+void Stylus::setInk(Color c)
 {
-    ink = i;
+    ink = c;
 }
 
 void Stylus::swapMode(Mode m)
@@ -37,7 +37,7 @@ int Stylus::getWidth()
     return width;
 }
 
-sf::Color Stylus::getInk()
+Color& Stylus::getInk()
 {
     return ink;
 }

@@ -5,6 +5,7 @@
 #include "squiggle.h"
 #include "stylus.h"
 #include "board.h"
+#include "color.h"
 #include "clickable.h"
 #include "fileManager.h"
 #include "hud.h"
@@ -48,7 +49,7 @@ int main(int argc, char ** argv)
     std::string alert = "";
     bool capsLock = false;
 
-    Stylus pen(4, sf::Color(0,0,0));
+    Stylus pen(4, Color(0,0,0));
 
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);
     HUD hud(screenWidth, screenHeight);
@@ -131,7 +132,7 @@ int main(int argc, char ** argv)
                 else if(pen.getMode() == Stylus::DRAW)
                     canvas->startSqui(loc, pen.getWidth(), pen.getInk());
                 else if(pen.getMode() == Stylus::ERASE)
-                    canvas->startSqui(loc, pen.getWidth(), sf::Color::White);
+                    canvas->startSqui(loc, pen.getWidth(), Color::White);
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
@@ -165,23 +166,23 @@ int main(int argc, char ** argv)
                 }
                 else if(e.key.code == sf::Keyboard::G)
                 {
-                    pen.setInk(sf::Color(34,200,34));
+                    pen.setInk(Color::GreenAlt);
                 }
                 else if(e.key.code == sf::Keyboard::B)
                 {
-                    pen.setInk(sf::Color::Black);
+                    pen.setInk(Color::Black);
                 }
                 else if(e.key.code == sf::Keyboard::O)
                 {
-                    pen.setInk(sf::Color(255,125,0));
+                    pen.setInk(Color::Orange);
                 }
                 else if(e.key.code == sf::Keyboard::R)
                 {
-                    pen.setInk(sf::Color::Red);
+                    pen.setInk(Color::Red);
                 }
                 else if(e.key.code == sf::Keyboard::L)
                 {
-                    pen.setInk(sf::Color::Blue);
+                    pen.setInk(Color::Blue);
                 }
                 else if(e.key.code == sf::Keyboard::Up)
                 {
@@ -238,7 +239,7 @@ int main(int argc, char ** argv)
                     canvas->continueSqui(loc, pen.getWidth(), pen.getInk());
                     break;
                 case Stylus::ERASE:
-                    canvas->continueSqui(loc, pen.getWidth(), sf::Color::White);
+                    canvas->continueSqui(loc, pen.getWidth(), Color::White);
                     //canvas->erase(loc, pen.getWidth());
                     break;
                 default:

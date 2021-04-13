@@ -29,8 +29,8 @@ public:
     Board(std::fstream& file, int w, int h, std::string title); //loading a board
     ~Board();
 
-    void startSqui(sf::Vector2i& loc, int w, sf::Color i);
-    void continueSqui(sf::Vector2i& loc, int w, sf::Color i);
+    void startSqui(sf::Vector2i& loc, int w, Color c);
+    void continueSqui(sf::Vector2i& loc, int w, Color c);
 
     void draw(sf::RenderWindow& win);
 

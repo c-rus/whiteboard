@@ -2,6 +2,7 @@
 #include <stack>
 #include <list>
 #include <SFML/Graphics.hpp>
+#include "color.h"
 #include "box.h"
 #include <fstream>
 
@@ -14,11 +15,11 @@ private:
     Box bounds;
 
 public:
-    Squiggle(sf::Vector2i& start, int width, sf::Color color);
+    Squiggle(sf::Vector2i& start, int width, Color color);
     Squiggle(std::fstream& file); //loading from file
     ~Squiggle();
 
-    bool addPoint(sf::Vector2i& p, int width, sf::Color color);
+    bool addPoint(sf::Vector2i& p, int width, Color color);
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
     void zoom(int magnify, sf::Vector2i& mPoint);

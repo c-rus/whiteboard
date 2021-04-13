@@ -1,10 +1,10 @@
 #include "squiggle.h"
 
-Squiggle::Squiggle(sf::Vector2i& start, int width, sf::Color color)
+Squiggle::Squiggle(sf::Vector2i& start, int width, Color c)
 {
     this->prev = sf::Vector2f(start);
     sf::CircleShape* l = new sf::CircleShape(width);
-    l->setFillColor(color);
+    l->setFillColor(c.getSFColor());
     l->setPosition(sf::Vector2f(start));
     lines.push_back(l);
     bounds = Box(start.x, start.y, width, width);
@@ -64,7 +64,7 @@ void Squiggle::move(sf::Vector2i& offset)
     bounds.shift(offset.x, offset.y);
 }
 
-bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
+bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
 {
     if(prev == sf::Vector2f(p))
         return false;
@@ -93,7 +93,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
             prev.y+=slopeYoverX;
 
             sf::CircleShape* l = new sf::CircleShape(w);
-            l->setFillColor(color);
+            l->setFillColor(c.getSFColor());
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
             bounds.stretch(prev.x+w, prev.y+w);
@@ -108,7 +108,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, sf::Color color)
             prev.x+=slopeXoverY;
 
             sf::CircleShape* l = new sf::CircleShape(w);
-            l->setFillColor(color);
+            l->setFillColor(c.getSFColor());
             l->setPosition(sf::Vector2f(prev));
             lines.push_back(l);
             bounds.stretch(prev.x+w, prev.y+w);

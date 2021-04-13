@@ -15,16 +15,16 @@ Board::~Board()
     clear();
 }
 
-void Board::startSqui(sf::Vector2i& loc, int w, sf::Color i)
+void Board::startSqui(sf::Vector2i& loc, int w, Color c)
 {
-    scribs.push_back(new Squiggle(loc, w, i));
+    scribs.push_back(new Squiggle(loc, w, c));
     refresh = true;
     visibleScribs.push_back(scribs.back());
 }
 
-void Board::continueSqui(sf::Vector2i& loc, int w, sf::Color i)
+void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
 {
-    refresh = refresh || scribs.back()->addPoint(loc, w, i);
+    refresh = refresh || scribs.back()->addPoint(loc, w, c);
 }
 
 void Board::pan(sf::Vector2i& offset)
