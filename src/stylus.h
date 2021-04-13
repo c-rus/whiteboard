@@ -14,6 +14,7 @@ public:
 private:
     Color ink;
     int width;
+    sf::Cursor style;
     const int MIN_W = 1;
     const int MAX_W = 20;
     Mode form;
@@ -23,7 +24,7 @@ public:
     
     void setInk(Color c);
     void setWidth(int w);
-    void swapMode(Mode m);
+    sf::Cursor& swapMode(Mode m);
 
     Mode getMode();
     int getWidth();

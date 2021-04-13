@@ -50,6 +50,7 @@ int main(int argc, char ** argv)
     bool capsLock = false;
 
     Stylus pen(4, Color(0,0,0));
+    window.setMouseCursor(pen.swapMode(pen.getMode())); //set initial cursor
 
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);
     HUD hud(screenWidth, screenHeight);
@@ -194,11 +195,11 @@ int main(int argc, char ** argv)
                 }
                 else if(e.key.code == sf::Keyboard::E)
                 {
-                    pen.swapMode(Stylus::ERASE);
+                    window.setMouseCursor(pen.swapMode(Stylus::ERASE));
                 }
                 else if(e.key.code == sf::Keyboard::D)
                 {
-                    pen.swapMode(Stylus::DRAW);
+                    window.setMouseCursor(pen.swapMode(Stylus::DRAW));
                 }
                 else if(e.key.code == sf::Keyboard::C) canvas->clear();
             }
