@@ -10,14 +10,12 @@ private:
     //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
-    std::string name;
-    
     std::list<Squiggle*> visibleScribs;
+
+    std::string name;
     bool refresh;
     int frameBuffer;
-
     Box frame;
-
     int width;
     int height;
 

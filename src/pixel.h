@@ -12,5 +12,6 @@ public:
     Pixel(sf::Vector2f& loc, int r, Color c);
     Pixel();
     ~Pixel();
-    sf::CircleShape& self();
+    sf::CircleShape& getDot();
+    std::string getKey();
 };

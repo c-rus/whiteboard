@@ -19,7 +19,7 @@ Squiggle::~Squiggle()
 void Squiggle::draw(sf::RenderWindow& win)
 {
     for(auto it = lines.begin(); it != lines.end(); it++)
-        win.draw((*it)->self());
+        win.draw((*it)->getDot());
 }
 
 //TODO: Work on fixing zoom 
@@ -32,7 +32,7 @@ void Squiggle::move(sf::Vector2i& offset)
 {
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        auto l = (*it)->self();
+        auto& l = (*it)->getDot();
         l.setPosition(l.getPosition()+sf::Vector2f(offset));
     }
     bounds.shift(offset.x, offset.y);
@@ -64,7 +64,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
         while(prev.x != p.x)
         {
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
-            prev.y+=slopeYoverX;
+            prev.y += slopeYoverX;
 
             lines.push_back(new Pixel(prev, w, c));
             bounds.stretch(prev.x+w, prev.y+w);
@@ -76,7 +76,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
         while(prev.y != p.y)
         {
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
-            prev.x+=slopeXoverY;
+            prev.x += slopeXoverY;
 
             lines.push_back(new Pixel(prev, w, c));
             bounds.stretch(prev.x+w, prev.y+w);
@@ -131,9 +131,9 @@ Squiggle::Squiggle(std::fstream& file)
         unsigned short width = 0;
         file.read((char*)&width, sizeof(width));
 
-        p->self().setPosition(sf::Vector2f(x, y));
-        p->self().setFillColor(sf::Color(r, g, b, a));
-        p->self().setRadius(width);
+        p->getDot().setPosition(sf::Vector2f(x, y));
+        p->getDot().setFillColor(sf::Color(r, g, b, a));
+        p->getDot().setRadius(width);
         lines.push_back(p);
     }
 }
@@ -156,7 +156,7 @@ void Squiggle::save(std::fstream& file)
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        auto l = (*it)->self();
+        auto l = (*it)->getDot();
         //location
         int x = l.getPosition().x;
         int y = l.getPosition().y;;
