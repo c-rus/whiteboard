@@ -53,15 +53,17 @@ void Squiggle::move(sf::Vector2i& offset)
 
 void Squiggle::compress()
 {
+    //create render texture
     rt = new sf::RenderTexture();
     rt->create(bounds.getWidth(), bounds.getHeight());
     rt->clear(Color(0,0,0,0).getSFColor());
     //traverse the list of pixels into a single texture
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        auto& d = (*it)->getDot();
-        d.setPosition(d.getPosition()-sf::Vector2f(bounds.getX(), bounds.getY()));
-        rt->draw(d);
+        Pixel& p = (**it);
+        p.setLocation(p.getLocation()-sf::Vector2f(bounds.getX(), bounds.getY()));
+        rt->draw(p.getDot());
+        (*it)->drop(); //delete the dynamically allocated sfml shape (no longer needed)
     }
     //set the texture to a sprite to handle for future drawing to screen
     rt->display();
@@ -146,7 +148,7 @@ Squiggle::Squiggle(std::fstream& file)
     int size = 0;
     file.read((char*)&size, sizeof(size));
 
-    //what were the bounds?
+    //what were the bounds again?
     int x = 0;
     file.read((char*)&x, sizeof(x));
     int y = 0;
@@ -159,7 +161,6 @@ Squiggle::Squiggle(std::fstream& file)
     
     for(int i = 0; i < size; i++)
     {
-        Pixel* p = new Pixel();
         //location
         file.read((char*)&x, sizeof(x));
         file.read((char*)&y, sizeof(y));
@@ -175,13 +176,10 @@ Squiggle::Squiggle(std::fstream& file)
         //radius
         unsigned short radius = 0;
         file.read((char*)&radius, sizeof(radius));
-
-        p->getDot().setPosition(sf::Vector2f(x, y));
-        p->getDot().setFillColor(sf::Color(r, g, b, a));
-        p->getDot().setRadius(radius);
-        lines.push_back(p);
+        sf::Vector2f location(x, y);
+        lines.push_back(new Pixel(location, radius, Color(r, g, b, a)));
     }
-    
+
     compress();
 }
 
@@ -204,23 +202,23 @@ void Squiggle::save(std::fstream& file)
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
-        auto l = (*it)->getDot();
+        Pixel& p = (**it);
         //location
-        int x = l.getPosition().x+sp->getPosition().x;
-        int y = l.getPosition().y+sp->getPosition().y;
+        int x = p.getLocation().x+sp->getPosition().x;
+        int y = p.getLocation().y+sp->getPosition().y;
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(y));
         //color
-        unsigned char r = l.getFillColor().r;
-        unsigned char g = l.getFillColor().g;
-        unsigned char b = l.getFillColor().b;
-        unsigned char a = l.getFillColor().a;
+        unsigned char r = p.getColor().GetR();
+        unsigned char g = p.getColor().GetG();
+        unsigned char b = p.getColor().GetB();
+        unsigned char a = p.getColor().GetA();
         file.write((char*)&r, sizeof(r));
         file.write((char*)&g, sizeof(g));
         file.write((char*)&b, sizeof(b));
         file.write((char*)&a, sizeof(a));
         //radius
-        unsigned short radius = (unsigned short)l.getRadius();
+        unsigned short radius = (unsigned short)p.getRadius();
         file.write((char*)&radius, sizeof(radius));
     }
 }
