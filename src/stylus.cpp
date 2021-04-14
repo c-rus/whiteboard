@@ -1,9 +1,9 @@
 #include "stylus.h"
 
-Stylus::Stylus(int w, Color c)
+Stylus::Stylus(int r, Color c)
 {
     ink = c;
-    width = w;
+    radius = r;
     swapMode(DRAW);
 }
 
@@ -30,14 +30,14 @@ sf::Cursor& Stylus::swapMode(Mode m)
     return style;
 }
 
-void Stylus::setWidth(int w)
+void Stylus::setRadius(int r)
 {
-    if(w < MIN_W)
-        width = MIN_W;
-    else if(w > MAX_W)
-        width = MAX_W;
+    if(r < MIN_R)
+        radius = MIN_R;
+    else if(r > MAX_R)
+        radius = MAX_R;
     else
-        width = w;
+        radius = r;
 }
 
 Stylus::Mode Stylus::getMode()
@@ -45,9 +45,9 @@ Stylus::Mode Stylus::getMode()
     return form;
 }
 
-int Stylus::getWidth()
+int Stylus::getRadius()
 {
-    return width;
+    return radius;
 }
 
 Color& Stylus::getInk()

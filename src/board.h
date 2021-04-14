@@ -31,7 +31,7 @@ public:
     void compressSqui();
 
     void draw(sf::RenderWindow& win);
-
+    void zoom(int scale, sf::Vector2f& origin);
     void pan(sf::Vector2i& offset);
 
     //light erase- only erase top-level squiggle components

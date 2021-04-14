@@ -14,10 +14,9 @@ private:
 public:
     HUD(int w, int h);
     void update();
-    void draw(sf::RenderTexture& surf);
-    
-    sf::Sprite getLayer(sf::RenderTexture& surf);
+    void draw(sf::RenderWindow& win);
+
     void resize(int w, int h);
-    bool inspect(sf::Vector2i& mLoc);
+    void inspect(sf::Vector2i& mLoc);
     bool interact(sf::Vector2i& mLoc, Board& b);
 };

@@ -1,10 +1,11 @@
 #pragma once
 #include <stack>
 #include <list>
+#include <fstream>
+#include <math.h>
 #include <SFML/Graphics.hpp>
 #include "color.h"
 #include "box.h"
-#include <fstream>
 #include "pixel.h"
 
 //a squiggle is made from a pair of points, with lines drawn from each successive pair
@@ -16,6 +17,7 @@ private:
     sf::RenderTexture* rt = nullptr;
     sf::Sprite* sp = nullptr;
     Box bounds;
+    int scalar;
     bool optimized;
 
 public:
@@ -26,7 +28,7 @@ public:
     bool addPoint(sf::Vector2i& p, int radius, Color color);
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
-    void zoom(int magnify, sf::Vector2i& mPoint);
+    void zoom(int scale, sf::Vector2f& origin);
     int count();
     void compress();
 

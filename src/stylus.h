@@ -13,20 +13,20 @@ public:
 
 private:
     Color ink;
-    int width;
+    int radius;
     sf::Cursor style;
-    const int MIN_W = 1;
-    const int MAX_W = 20;
+    const int MIN_R = 1;
+    const int MAX_R = 20;
     Mode form;
 
 public:
-    Stylus(int w, Color c);
+    Stylus(int r, Color c);
     
     void setInk(Color c);
-    void setWidth(int w);
+    void setRadius(int r);
     sf::Cursor& swapMode(Mode m);
 
     Mode getMode();
-    int getWidth();
+    int getRadius();
     Color& getInk();
 };

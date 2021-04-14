@@ -6,6 +6,7 @@ Squiggle::Squiggle(sf::Vector2i& start, int radius, Color c)
     lines.push_back(new Pixel(prev, radius, c));
     bounds = Box(start.x, start.y, radius*2, radius*2);
     optimized = false;
+    scalar = 1;
 }
 
 Squiggle::~Squiggle()
@@ -31,9 +32,67 @@ void Squiggle::draw(sf::RenderWindow& win)
 }
 
 //TODO: Work on fixing zoom 
-void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
+void Squiggle::zoom(int scale, sf::Vector2f& origin)
 {
-    
+    int quad = 0;
+    int offX = 0;
+    int offY = 0;
+    if(sp->getPosition().x >= origin.x)
+    {
+        if(sp->getPosition().y <= origin.y)
+        {
+            quad = 1;
+            offY = bounds.getHeight();
+        }
+        else
+        {
+            quad = 4;
+        }
+    }
+    else
+    {
+        if(sp->getPosition().y <= origin.y)
+        {
+            quad = 2;
+            offX = bounds.getWidth();
+            offY = bounds.getHeight();
+        }
+        else
+        {
+            offX = bounds.getWidth();
+            quad = 3;
+        }
+    }
+    sf::Vector2f prevSize = sf::Vector2f(sp->getGlobalBounds().width, sp->getGlobalBounds().height);
+    //calculate difference between endpoints
+    sf::Vector2f dist = sf::Vector2f(sp->getPosition().x+offX, sp->getPosition().y+offY)-origin;
+    scalar -= scale;
+    float f = 1;
+    if(scale == 1)
+        f = 2*(sp->getScale().x+0.5);
+    else
+        f = 0.5*(sp->getScale().x);
+    sp->setScale(sf::Vector2f(f, f));
+    sf::Vector2f size = sf::Vector2f(sp->getGlobalBounds().width, sp->getGlobalBounds().height);
+    std::cout << "difference in width: " << size.x-prevSize.x << std::endl;
+    sf::Vector2f diff = size - prevSize;
+    //wrong implementation-
+    if(scale == 1)
+        sp->setPosition(sp->getPosition()+sf::Vector2f(2*dist.x, 2*dist.y));
+    else
+        sp->setPosition(sp->getPosition()-sf::Vector2f(0.5*dist.x, 0.5*dist.y));
+    /*if(scale == -1)
+        sp->setPosition((sp->getPosition().x+origin.x)/2, (sp->getPosition().y+origin.y)/2);
+    else
+        sp->setPosition(sp->getPosition().x*2, sp->getPosition().y*2);
+    */
+    //square both values
+    dist.x = dist.x*dist.x;
+    dist.y = dist.y*dist.y;
+    //take the square root of the sum of x and y
+    float mag = sqrt(dist.x+dist.y);
+    std::cout << "distance from the center of the page: " << mag << std::endl;
+    //everything must be zooming out from the origin (centerpoint)
 }
 
 void Squiggle::move(sf::Vector2i& offset)
@@ -146,6 +205,7 @@ Box& Squiggle::getBounds()
 Squiggle::Squiggle(std::fstream& file)
 {
     int size = 0;
+    scalar = 1;
     file.read((char*)&size, sizeof(size));
 
     //what were the bounds again?

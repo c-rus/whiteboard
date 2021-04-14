@@ -36,14 +36,11 @@ int main(int argc, char ** argv)
     sf::Image icn;
     icn.loadFromFile("./assets/icon.png");
     window.setIcon(32, 32, icn.getPixelsPtr());
-    sf::RenderTexture surf;
-    surf.create(screenWidth, screenHeight);
 
     std::cout << "Welcome to whiteboard!" << std::endl;
     window.setFramerateLimit(60);
     sf::Vector2i loc, prevLoc, diff;
-    std::queue<int> scrollPaces;
-    int lastSpeed = 0;
+    int scrollPace = 0;
 
     std::string name = "";
     std::string alert = "";
@@ -55,16 +52,17 @@ int main(int argc, char ** argv)
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);
     HUD hud(screenWidth, screenHeight);
 
-    bool pressed, pan, cmd;
+    bool pressed, pan, cmd, scrolling;
     bool askforTitle = false;
     bool upToDate = true;
-    pressed = pan = cmd = false;
+    pressed = pan = cmd = scrolling = false;
     while(window.isOpen())
     {
         if(canvas->isRefreshing())
             upToDate = false;
             
         canvas->deassertRefresh();
+        scrolling = false;
 
         if(!upToDate)
             window.setTitle(canvas->getName() + "* - " + title + alert);
@@ -87,6 +85,7 @@ int main(int argc, char ** argv)
                     askforTitle = false;
                     alert = "";
                     upToDate = fm.save(*canvas, true);
+                    std::cout << "Save successful!" << std::endl;
                 }
                 else if(e.key.code >= sf::Keyboard::A && e.key.code <= sf::Keyboard::Z)
                 {
@@ -104,8 +103,7 @@ int main(int argc, char ** argv)
             else if(e.type == sf::Event::Resized)
             {
                 sf::FloatRect visibleArea(0, 0, e.size.width, e.size.height);
-                canvas->resize(visibleArea.width, visibleArea.height);    
-                surf.create(visibleArea.width, visibleArea.height);
+                canvas->resize(visibleArea.width, visibleArea.height);
                 window.setView(sf::View(visibleArea));
             }
             else if(e.type == sf::Event::MouseButtonReleased)
@@ -117,8 +115,7 @@ int main(int argc, char ** argv)
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
                 loc = sf::Mouse::getPosition(window);
-                if(hud.inspect(loc))
-                    canvas->assertRefresh();
+                hud.inspect(loc);
             }
             else if(e.type == sf::Event::MouseButtonPressed)
             {   
@@ -133,20 +130,22 @@ int main(int argc, char ** argv)
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else if(pen.getMode() == Stylus::DRAW)
-                    canvas->startSqui(loc, pen.getWidth(), pen.getInk());
+                    canvas->startSqui(loc, pen.getRadius(), pen.getInk());
                 else if(pen.getMode() == Stylus::ERASE)
-                    canvas->startSqui(loc, pen.getWidth(), Color::White);
+                    canvas->startSqui(loc, pen.getRadius(), Color::White);
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
-                //TODO: Smoother scrolling
+                int maxPace = 50;
                 int direction = (e.mouseWheel.delta < 0) ? -1 : 1;
-                if(lastSpeed != 0 && lastSpeed/abs(lastSpeed) != direction)
+                if(scrollPace != 0 && scrollPace/abs(scrollPace) != direction)
                     direction = -direction;
-                //int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta + 4*e.mouseWheel.delta + 1*direction;
-                int pace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta;
-                //std::cout << pace << std::endl;
-                scrollPaces.push(pace);
+                scrollPace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta;
+                
+                if(abs(scrollPace) > maxPace)
+                    scrollPace = maxPace*direction;
+
+                scrolling = true;
             }
             else if(e.type == sf::Event::KeyPressed)
             {
@@ -171,6 +170,17 @@ int main(int argc, char ** argv)
                 {
                     pen.setInk(Color::GreenAlt);
                 }
+                else if(e.key.code == sf::Keyboard::W)
+                {
+                    //calculate origin
+                    sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
+                    canvas->zoom(1, origin);
+                }
+                else if(e.key.code == sf::Keyboard::Y)
+                {
+                    sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
+                    canvas->zoom(-1, origin);
+                }
                 else if(e.key.code == sf::Keyboard::B)
                 {
                     pen.setInk(Color::Black);
@@ -189,11 +199,11 @@ int main(int argc, char ** argv)
                 }
                 else if(e.key.code == sf::Keyboard::Up)
                 {
-                    pen.setWidth(pen.getWidth()+1);
+                    pen.setRadius(pen.getRadius()+1);
                 }
                 else if(e.key.code == sf::Keyboard::Down)
                 {
-                    pen.setWidth(pen.getWidth()-1);
+                    pen.setRadius(pen.getRadius()-1);
                 }
                 else if(e.key.code == sf::Keyboard::E)
                 {
@@ -217,14 +227,12 @@ int main(int argc, char ** argv)
         hud.update();
 
         loc = sf::Mouse::getPosition(window);
-        if(pan || !scrollPaces.empty())
+        if(pan || scrolling)
         {
-            if(!scrollPaces.empty())
+            if(scrolling)
             {
-                lastSpeed = scrollPaces.front();
-                scrollPaces.pop(); 
-                sf::Vector2i scrollPace(0, lastSpeed);
-                canvas->pan(scrollPace);  
+                sf::Vector2i paceVec(0, scrollPace);
+                canvas->pan(paceVec);  
             }
             else
             {
@@ -232,17 +240,16 @@ int main(int argc, char ** argv)
                 canvas->pan(diff);
                 prevLoc = loc;
             }
-
         }
         else if(pressed)
         {
             switch(pen.getMode())
             {
                 case Stylus::DRAW:
-                    canvas->continueSqui(loc, pen.getWidth(), pen.getInk());
+                    canvas->continueSqui(loc, pen.getRadius(), pen.getInk());
                     break;
                 case Stylus::ERASE:
-                    canvas->continueSqui(loc, pen.getWidth(), Color::White);
+                    canvas->continueSqui(loc, pen.getRadius(), Color::White);
                     //canvas->erase(loc, pen.getWidth());
                     break;
                 default:
@@ -250,10 +257,9 @@ int main(int argc, char ** argv)
             }
         }
 
-        hud.draw(surf);
-        canvas->draw(window);
         
-        window.draw(hud.getLayer(surf));
+        canvas->draw(window);
+        hud.draw(window);
         window.display();
     }
 

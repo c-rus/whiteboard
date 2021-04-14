@@ -25,7 +25,6 @@ bool HUD::interact(sf::Vector2i& mLoc, Board& b)
             return true;
         }
     }
-    
     return false;
 }
 
@@ -44,7 +43,7 @@ void HUD::update()
         counter = 0;  
 }
 
-bool HUD::inspect(sf::Vector2i& mLoc)
+void HUD::inspect(sf::Vector2i& mLoc)
 {
     auto prevInspect = inspecting;
     inspecting = knobs.end();
@@ -53,19 +52,10 @@ bool HUD::inspect(sf::Vector2i& mLoc)
         if((*it).highlight(mLoc))
             inspecting = it;
     }
-
-    return (prevInspect != inspecting);
 }
 
-void HUD::draw(sf::RenderTexture& surf)
+void HUD::draw(sf::RenderWindow& win)
 {
-    surf.clear(sf::Color::Transparent);
     for(auto it = knobs.begin(); it != knobs.end(); it++)
-        (*it).draw(surf);
-}
-
-sf::Sprite HUD::getLayer(sf::RenderTexture& surf)
-{
-    surf.display();
-    return sf::Sprite(surf.getTexture());
+        (*it).draw(win);
 }

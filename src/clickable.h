@@ -8,8 +8,8 @@ private:
     Box bounds;
     sf::Sprite sp;
     sf::Text t;
-    sf::Texture* tx; //fix
-    sf::Font* ft; //fix
+    sf::Texture* tx;
+    sf::Font* ft;
     bool tipVisible;
 
 public:
@@ -32,24 +32,28 @@ public:
         tipVisible = false;
     };
 
+    ~Clickable()
+    {
+        delete tx;
+        delete ft;
+    };
+
     void showToolTip()
     {
         tipVisible = true;
-    }
+    };
 
-    void draw(sf::RenderTexture& surf)
+    void draw(sf::RenderWindow& win)
     {
-        //TODO: stop drawing every frame, only draw when needing to refresh for opacity look
-        surf.draw(sp);
+        win.draw(sp);
         if(tipVisible)
         {
-            
             sf::RectangleShape background;
             background.setSize(sf::Vector2f(t.getGlobalBounds().width, t.getGlobalBounds().height+20));
             background.setPosition(t.getPosition().x, bounds.getY());
             background.setFillColor(sf::Color::Black);
-            surf.draw(background);
-            surf.draw(t);
+            win.draw(background);
+            win.draw(t);
             //std::cout << "recycle" << std::endl;
         }
     };
@@ -74,5 +78,6 @@ public:
             tipVisible = false;
         }
         return false;
-    }
+    };
+
 };

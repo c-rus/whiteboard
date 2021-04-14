@@ -32,6 +32,15 @@ void Board::compressSqui()
     refresh = true;
 }
 
+void Board::zoom(int scale, sf::Vector2f& origin)
+{
+    for(auto it = scribs.begin(); it != scribs.end(); it++)
+    {
+        //calculate distance from center of screen
+        (*it)->zoom(scale, origin);
+    }
+}
+
 void Board::pan(sf::Vector2i& offset)
 {
     refresh = true;
