@@ -17,17 +17,13 @@ private:
     sf::Sprite* sp = nullptr;
     Box bounds;
     bool optimized;
-    //goal:
-    //1- create the render texture
-    //2- draw pixels to render texture
-    //2- once done drawing pixels -> (call display()) -> store the getTexture() in a sprite
 
 public:
-    Squiggle(sf::Vector2i& start, int width, Color color);
+    Squiggle(sf::Vector2i& start, int radius, Color color);
     Squiggle(std::fstream& file); //loading from file
     ~Squiggle();
 
-    bool addPoint(sf::Vector2i& p, int width, Color color);
+    bool addPoint(sf::Vector2i& p, int radius, Color color);
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
     void zoom(int magnify, sf::Vector2i& mPoint);

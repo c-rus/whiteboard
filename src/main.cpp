@@ -110,7 +110,7 @@ int main(int argc, char ** argv)
             }
             else if(e.type == sf::Event::MouseButtonReleased)
             {
-                if(pressed) //finished a squiggle
+                if(pressed && !pan) //finished a squiggle
                     canvas->compressSqui();
                 pressed = pan = false;
             }

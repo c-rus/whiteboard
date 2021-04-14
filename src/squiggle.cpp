@@ -1,10 +1,10 @@
 #include "squiggle.h"
 
-Squiggle::Squiggle(sf::Vector2i& start, int width, Color c)
+Squiggle::Squiggle(sf::Vector2i& start, int radius, Color c)
 {
     this->prev = sf::Vector2f(start);
-    lines.push_back(new Pixel(prev, width, c));
-    bounds = Box(start.x, start.y, width*2, width*2);
+    lines.push_back(new Pixel(prev, radius, c));
+    bounds = Box(start.x, start.y, radius*2, radius*2);
     optimized = false;
 }
 
@@ -38,7 +38,7 @@ void Squiggle::zoom(int magnify, sf::Vector2i& mPoint)
 
 void Squiggle::move(sf::Vector2i& offset)
 {
-    if(optimized)
+    if(optimized) 
         sp->setPosition(sp->getPosition()+sf::Vector2f(offset));
     else
     {
@@ -56,20 +56,23 @@ void Squiggle::compress()
     rt = new sf::RenderTexture();
     rt->create(bounds.getWidth(), bounds.getHeight());
     rt->clear(Color(0,0,0,0).getSFColor());
+    //traverse the list of pixels into a single texture
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         auto& d = (*it)->getDot();
         d.setPosition(d.getPosition()-sf::Vector2f(bounds.getX(), bounds.getY()));
         rt->draw(d);
     }
+    //set the texture to a sprite to handle for future drawing to screen
     rt->display();
     sp = new sf::Sprite();
     sp->setTexture(rt->getTexture());
     sp->setPosition(bounds.getX(), bounds.getY());
+    
     optimized = true;
 }
 
-bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
+bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c)
 {
     if(prev == sf::Vector2f(p))
         return false;
@@ -100,9 +103,9 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
             prev.x = (prev.x < p.x) ? prev.x+1 : prev.x-1;
             prev.y += slopeYoverX;
 
-            lines.push_back(new Pixel(prev, w, c));
-            int borderX = (headedRight) ? prev.x+(2*w) : prev.x;
-            int borderY = (headedDown) ? prev.y+(2*w) : prev.y;
+            lines.push_back(new Pixel(prev, r, c));
+            int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
+            int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
             bounds.stretch(borderX, borderY);
         }
     }
@@ -117,9 +120,9 @@ bool Squiggle::addPoint(sf::Vector2i& p, int w, Color c)
             prev.y = (prev.y < p.y) ? prev.y+1 : prev.y-1;
             prev.x += slopeXoverY;
 
-            lines.push_back(new Pixel(prev, w, c));
-            int borderY = (headedDown) ? prev.y+(2*w) : prev.y;
-            int borderX = (headedRight) ? prev.x+(2*w) : prev.x;
+            lines.push_back(new Pixel(prev, r, c));
+            int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
+            int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
             bounds.stretch(borderX, borderY);
         }
     }
@@ -169,20 +172,23 @@ Squiggle::Squiggle(std::fstream& file)
         file.read((char*)&g, sizeof(g));
         file.read((char*)&b, sizeof(b));
         file.read((char*)&a, sizeof(a));
-        //width
-        unsigned short width = 0;
-        file.read((char*)&width, sizeof(width));
+        //radius
+        unsigned short radius = 0;
+        file.read((char*)&radius, sizeof(radius));
 
         p->getDot().setPosition(sf::Vector2f(x, y));
         p->getDot().setFillColor(sf::Color(r, g, b, a));
-        p->getDot().setRadius(width);
+        p->getDot().setRadius(radius);
         lines.push_back(p);
     }
+    
+    compress();
 }
 
 void Squiggle::save(std::fstream& file)
 {
     int size = lines.size();
+    std::cout << size << std::endl;
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
 
     //save the bounds
@@ -194,14 +200,14 @@ void Squiggle::save(std::fstream& file)
     file.write((char*)&temp, sizeof(temp));
     temp = bounds.getHeight();
     file.write((char*)&temp, sizeof(temp));
-
+    
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         auto l = (*it)->getDot();
         //location
-        int x = l.getPosition().x;
-        int y = l.getPosition().y;;
+        int x = l.getPosition().x+sp->getPosition().x;
+        int y = l.getPosition().y+sp->getPosition().y;
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(y));
         //color
@@ -213,8 +219,8 @@ void Squiggle::save(std::fstream& file)
         file.write((char*)&g, sizeof(g));
         file.write((char*)&b, sizeof(b));
         file.write((char*)&a, sizeof(a));
-        //width
-        unsigned short w = (unsigned short)l.getRadius();
-        file.write((char*)&w, sizeof(w));
+        //radius
+        unsigned short radius = (unsigned short)l.getRadius();
+        file.write((char*)&radius, sizeof(radius));
     }
 }

@@ -14,7 +14,6 @@ private:
 
     std::string name;
     bool refresh;
-    int frameBuffer;
     Box frame;
     int width;
     int height;

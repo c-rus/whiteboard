@@ -21,8 +21,3 @@ sf::CircleShape& Pixel::getDot()
 {
     return *dot;
 }
-
-std::string Pixel::getKey()
-{
-    return std::to_string(dot->getPosition().x) + "," + std::to_string(dot->getPosition().y);
-}

@@ -5,7 +5,6 @@ Board::Board(int w, int h, std::string title)
     width = w;
     height = h;
     name = title;
-    frameBuffer = 0;
     refresh = false;
     frame = Box(0, 0, width, height);
 }
@@ -66,7 +65,6 @@ void Board::erase(sf::Vector2i& loc, int w)
 
 void Board::resize(int w, int h)
 {
-    refresh = true;
     if(w > MAX_W)
         width = MAX_W;
     else
@@ -84,18 +82,9 @@ void Board::resize(int w, int h)
 
 void Board::draw(sf::RenderWindow& win)
 {
-    if(refresh || frameBuffer < 2)
-    {
-        if(refresh) 
-            frameBuffer = 0;
-        //std::cout << "refreshing " << frameBuffer << std::endl;
-
-        win.clear(sf::Color::White);
-        for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
-            (*it)->draw(win); 
-        //std::cout << "Visible scribbles: " << visibleScribs.size() << std::endl;
-        frameBuffer++;
-    }
+    win.clear(sf::Color::White);
+    for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
+        (*it)->draw(win); 
 }
 
 void Board::setName(std::string& n)

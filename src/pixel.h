@@ -13,5 +13,4 @@ public:
     Pixel();
     ~Pixel();
     sf::CircleShape& getDot();
-    std::string getKey();
 };
