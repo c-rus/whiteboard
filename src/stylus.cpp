@@ -4,6 +4,7 @@ Stylus::Stylus(int r, Color c)
 {
     ink = c;
     radius = r;
+    eRadius = 10;
     swapMode(DRAW);
 }
 
@@ -32,12 +33,16 @@ sf::Cursor& Stylus::swapMode(Mode m)
 
 void Stylus::setRadius(int r)
 {
+    int* spot = &radius;
+    if(form == ERASE)
+        spot = &eRadius;
+
     if(r < MIN_R)
-        radius = MIN_R;
+        *spot = MIN_R;
     else if(r > MAX_R)
-        radius = MAX_R;
+        *spot = MAX_R;
     else
-        radius = r;
+        *spot = r;
 }
 
 Stylus::Mode Stylus::getMode()
@@ -47,6 +52,9 @@ Stylus::Mode Stylus::getMode()
 
 int Stylus::getRadius()
 {
+    if(form == ERASE)
+        return eRadius;
+    
     return radius;
 }
 

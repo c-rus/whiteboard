@@ -14,6 +14,7 @@ public:
 private:
     Color ink;
     int radius;
+    int eRadius;
     sf::Cursor style;
     const int MIN_R = 1;
     const int MAX_R = 20;

@@ -46,7 +46,7 @@ int main(int argc, char ** argv)
     std::string alert = "";
     bool capsLock = false;
 
-    Stylus pen(4, Color(0,0,0));
+    Stylus pen(2, Color(0,0,0));
     window.setMouseCursor(pen.swapMode(pen.getMode())); //set initial cursor
 
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);
@@ -130,9 +130,20 @@ int main(int argc, char ** argv)
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else if(pen.getMode() == Stylus::DRAW)
+                {
+                    //center the brush on the cursor
+                    loc.x = loc.x - pen.getRadius();
+                    loc.y = loc.y - pen.getRadius();
                     canvas->startSqui(loc, pen.getRadius(), pen.getInk());
+                }
                 else if(pen.getMode() == Stylus::ERASE)
+                {
+                    //center the brush on the cursor
+                    loc.x = loc.x - pen.getRadius();
+                    loc.y = loc.y - pen.getRadius();
                     canvas->startSqui(loc, pen.getRadius(), Color::White);
+                }
+                    
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
@@ -174,12 +185,12 @@ int main(int argc, char ** argv)
                 {
                     //calculate origin
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
-                    canvas->zoom(1, origin);
+                    //canvas->zoom(1, origin);
                 }
                 else if(e.key.code == sf::Keyboard::Y)
                 {
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
-                    canvas->zoom(-1, origin);
+                    //canvas->zoom(-1, origin);
                 }
                 else if(e.key.code == sf::Keyboard::B)
                 {
@@ -243,8 +254,10 @@ int main(int argc, char ** argv)
         }
         else if(pressed)
         {
+            loc.x = loc.x - pen.getRadius();
+            loc.y = loc.y - pen.getRadius();
             switch(pen.getMode())
-            {
+            { 
                 case Stylus::DRAW:
                     canvas->continueSqui(loc, pen.getRadius(), pen.getInk());
                     break;
