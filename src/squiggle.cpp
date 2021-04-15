@@ -218,32 +218,35 @@ Squiggle::Squiggle(std::fstream& file)
     int h = -1;
     file.read((char*)&h, sizeof(h));
     bounds = Box(x, y, w, h);
+
+    //load the color of the squiggle
+    unsigned char r = 0;
+    unsigned char g = 0;
+    unsigned char b = 0;
+    unsigned char a = 0;
+    file.read((char*)&r, sizeof(r));
+    file.read((char*)&g, sizeof(g));
+    file.read((char*)&b, sizeof(b));
+    file.read((char*)&a, sizeof(a));
+    Color ink(r, g, b, a);
     
     for(int i = 0; i < size; i++)
     {
         //location
         file.read((char*)&x, sizeof(x));
         file.read((char*)&y, sizeof(y));
-        //color
-        unsigned char r = 0;
-        unsigned char g = 0;
-        unsigned char b = 0;
-        unsigned char a = 0;
-        file.read((char*)&r, sizeof(r));
-        file.read((char*)&g, sizeof(g));
-        file.read((char*)&b, sizeof(b));
-        file.read((char*)&a, sizeof(a));
+
         //radius
         unsigned char radius = 0;
         file.read((char*)&radius, sizeof(radius));
         sf::Vector2f location(x, y);
-        lines.push_back(new Pixel(location, radius, Color(r, g, b, a)));
+        lines.push_back(new Pixel(location, radius, ink));
     }
 
     compress();
 }
 
-void Squiggle::save(std::fstream& file, HuffmanTree& ht)
+void Squiggle::save(std::fstream& file)
 {
     int size = lines.size();
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
@@ -257,6 +260,16 @@ void Squiggle::save(std::fstream& file, HuffmanTree& ht)
     file.write((char*)&temp, sizeof(temp));
     temp = bounds.getHeight();
     file.write((char*)&temp, sizeof(temp));
+
+    //save the color of the squiggle
+    unsigned char r = lines.front()->getColor().GetR();
+    unsigned char g = lines.front()->getColor().GetG();
+    unsigned char b = lines.front()->getColor().GetB();
+    unsigned char a = lines.front()->getColor().GetA();
+    file.write((char*)&r, sizeof(r));
+    file.write((char*)&g, sizeof(g));
+    file.write((char*)&b, sizeof(b));
+    file.write((char*)&a, sizeof(a));
     
     //save every pixel
     for(auto it = lines.begin(); it != lines.end(); it++)
@@ -267,16 +280,6 @@ void Squiggle::save(std::fstream& file, HuffmanTree& ht)
         int y = p.getLocation().y+sp->getPosition().y;
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(y));
-        //color
-        ht.emplace(p.getColor());
-        unsigned char r = p.getColor().GetR();
-        unsigned char g = p.getColor().GetG();
-        unsigned char b = p.getColor().GetB();
-        unsigned char a = p.getColor().GetA();
-        file.write((char*)&r, sizeof(r));
-        file.write((char*)&g, sizeof(g));
-        file.write((char*)&b, sizeof(b));
-        file.write((char*)&a, sizeof(a));
         //radius
         unsigned char radius = (unsigned char)p.getRadius();
         file.write((char*)&radius, sizeof(radius));

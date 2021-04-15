@@ -13,17 +13,59 @@ void HuffmanTree::emplace(Color& c)
 HuffmanTree::HuffmanTree()
 {
     longestBitWidth = 1;
-    colorsUsed = 0;
+    colorCount = 0;
 }
 
+//constructor for loading huffman tree
 HuffmanTree::HuffmanTree(std::fstream& file)
 {
+    //how many colors
+    unsigned int numOfColors = 0;
+    file.read((char*)&numOfColors, sizeof(numOfColors));
+    //create freqeuency table
+    for(unsigned int i = 0; i < numOfColors; i++)
+    {
+        unsigned int colorT = 0;
+        unsigned long freq = 0;
+        file.read((char*)&colorT, sizeof(colorT));
+        file.read((char*)&freq, sizeof(freq));
+        asciiFrequency[colorT] = freq;
+    }
+    std::cout << "here2" << std::endl;
+    //generate tree and codes
+    generate();
 
+    //read the data
+    while(!file.eof())
+    {
+        unsigned char byte = 0;
+        file.read((char*)&byte, sizeof(byte));
+        std::cout << transform(byte) << std::endl;
+        bundle.push(byte);
+    }
+    std::cout << "done loading" << std::endl;
 }
 
+//save frequency table
 void HuffmanTree::save(std::fstream& file)
 {
+    //how many colors
+    file.write((char*)&colorCount, sizeof(colorCount));
+    //save freqeuency table
+    for(auto it = asciiFrequency.begin(); it != asciiFrequency.end(); it++)
+    {
+        file.write((char*)&(it->first), sizeof(it->first));
+        file.write((char*)&(it->second), sizeof(it->second));
+    }
 
+    //save bits
+    std::queue<unsigned char> packed = encode();
+    while(!packed.empty())
+    {
+        file.write((char*)&packed.front(), sizeof(packed.front()));
+        std::cout << transform(packed.front()) << std::endl;
+        packed.pop();
+    }
 }
 
 void HuffmanTree::computeHeight(Node* root, int curLevel, unsigned long& deepestLevel)
@@ -46,9 +88,9 @@ void HuffmanTree::generate()
         asciiHeap.emplace(new Node(it->second, Color(it->first)));
     }
 
-    colorsUsed = asciiHeap.size();
+    colorCount = asciiHeap.size();
 
-    if(colorsUsed == 0) //do not proceed without any characters
+    if(colorCount == 0) //do not proceed without any characters
         return;
     
     //build huffman binary tree
@@ -70,7 +112,7 @@ void HuffmanTree::generate()
     asciiHeap.pop();
 
     //generate hashmap through full traversal of the huffman binary tree to easily find character codes later
-    if(colorsUsed > 1)
+    if(colorCount > 1)
         stashCodes(root);
     else //only 1 character exists to construct
         asciiCrypt[root->color.getIntValue()] = "0";  
@@ -85,7 +127,7 @@ Time complexity: worst case- O(1)
 */
 HuffmanTree::~HuffmanTree()
 {
-    if(colorsUsed > 0)
+    if(colorCount > 0)
         delete root;
 };
 
@@ -181,17 +223,20 @@ void HuffmanTree::stashCodes(Node* n, std::string code)
 };
 
 //decode bytes into a queue of colors
-std::queue<Color> HuffmanTree::decode(std::queue<unsigned char>& compressed)
+std::queue<Color> HuffmanTree::decode(std::queue<unsigned char>* compressed)
 {
+    if(compressed == nullptr)
+        compressed = &bundle;
+
     std::queue<Color> decompressed;
     int index = 0;
-    unsigned long endIndex = compressed.size()*8;
+    unsigned long endIndex = compressed->size()*8;
     //iterate through all bits of compressed string
-    if(compressed.size() == 0)
+    if(compressed->size() == 0)
         return decompressed;
 
-    unsigned char byte = compressed.front();
-    compressed.pop();
+    unsigned char byte = compressed->front();
+    compressed->pop();
 
     Node* cur = root;   
     while(index < endIndex)
@@ -209,10 +254,10 @@ std::queue<Color> HuffmanTree::decode(std::queue<unsigned char>& compressed)
                 cur = cur->left;
 
             index++;
-            if(!compressed.empty() && ((index % 8) == 0)) //are we onto the next byte?
+            if(!compressed->empty() && ((index % 8) == 0)) //are we onto the next byte?
             {
-                byte = compressed.front();
-                compressed.pop();
+                byte = compressed->front();
+                compressed->pop();
             }
         }
         //edge case detection if only one character exists in huffman binary tree

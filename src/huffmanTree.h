@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include "color.h"
 #include <list>
+#include <fstream>
 
 class HuffmanTree
 {
@@ -56,21 +57,19 @@ private:
     };
 
     void stashCodes(Node* n, std::string code="");
+    void computeHeight(Node* root, int curLevel, unsigned long& deepestLevel);
 
 private:
-    std::unordered_map<int, std::string> asciiCrypt;
-    std::unordered_map<int, unsigned long> asciiFrequency;
+    std::unordered_map<unsigned int, std::string> asciiCrypt;
+    std::unordered_map<unsigned int, unsigned long> asciiFrequency;
     const int INVALID_VALUE = Color::Transparent;
     std::priority_queue<Node*, std::vector<Node*>, NodeCompare> asciiHeap; //custom minHeap
     Node* root = nullptr;
-    unsigned int colorsUsed;
+    unsigned int colorCount;
     unsigned long longestBitWidth;
-
     std::queue<Color> waitToProcess;
-
-    void computeHeight(Node* root, int curLevel, unsigned long& deepestLevel);
+    std::queue<unsigned char> bundle;
     
-
 public:
     //must pack bits into groups of 8-bits (1 byte)
     HuffmanTree();
@@ -90,7 +89,7 @@ public:
 
     unsigned long getHeight();
 
-    std::queue<Color> decode(std::queue<unsigned char>& compressed);
+    std::queue<Color> decode(std::queue<unsigned char>* compressed=nullptr);
 
     void save(std::fstream& file); //saving tree codes to file
 };

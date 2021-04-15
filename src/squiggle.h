@@ -33,5 +33,5 @@ public:
     void compress();
 
     Box& getBounds();
-    void save(std::fstream& file, HuffmanTree& ht);
+    void save(std::fstream& file);
 };

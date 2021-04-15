@@ -21,6 +21,12 @@ Pixel::~Pixel()
     drop();
 }
 
+void Pixel::setColor(Color& c)
+{
+    dye = c;
+    dot->setFillColor(dye.getSFColor());
+}
+
 void Pixel::setLocation(sf::Vector2f loc)
 {
     if(dot != nullptr)

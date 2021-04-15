@@ -19,6 +19,7 @@ public:
     Color& getColor();
     void drop();
     int getRadius();
+    void setColor(Color& c);
     void setLocation(sf::Vector2f loc);
     sf::Vector2f& getLocation();
 };
