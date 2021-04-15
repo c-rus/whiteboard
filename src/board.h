@@ -13,7 +13,8 @@ private:
 
     std::string name;
     bool refresh;
-    Box frame;
+    Box frame; //the visible window
+    Box container; //the boundaries of the entire drawn art
     int width;
     int height;
 

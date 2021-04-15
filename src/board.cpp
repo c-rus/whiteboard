@@ -7,6 +7,7 @@ Board::Board(int w, int h, std::string title)
     name = title;
     refresh = false;
     frame = Box(0, 0, width, height);
+    container = Box(0,0);
 }
 
 Board::~Board()
@@ -29,6 +30,15 @@ void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
 void Board::compressSqui()
 {
     scribs.back()->compress();
+    //update container
+    Box& b = scribs.back()->getBounds();
+    if(container.getWidth() == -1 && container.getHeight() == -1)
+        container = b;
+    else
+    {
+        container.stretch(b.getX(), b.getY());
+        container.stretch(b.getX()+b.getWidth(), b.getY()+b.getHeight());
+    }
     refresh = true;
 }
 
@@ -56,6 +66,7 @@ void Board::pan(sf::Vector2i& offset)
     {
         (*it)->move(offset);
     }
+    container.shift(offset.x, offset.y);
 }
 
 void Board::erase(sf::Vector2i& loc, int w)
@@ -171,7 +182,9 @@ Board::Board(std::fstream& file, int w, int h, std::string title) : Board(w, h, 
         scribs.push_back(new Squiggle(file));
         if(frame.contains(scribs.back()->getBounds()))
             visibleScribs.push_back(scribs.back());
+        compressSqui();
     }
+    deassertRefresh();
 }
 
 void Board::save(std::fstream& file)

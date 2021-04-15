@@ -243,7 +243,6 @@ Squiggle::Squiggle(std::fstream& file)
         lines.push_back(new Pixel(location, radius, ink));
     }
 
-    compress();
     scalar = 1;
 }
 
