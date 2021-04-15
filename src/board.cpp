@@ -8,6 +8,7 @@ Board::Board(int w, int h, std::string title)
     refresh = false;
     frame = Box(0, 0, width, height);
     container = Box(0,0);
+    backdrop = Color::White;
 }
 
 Board::~Board()
@@ -18,13 +19,13 @@ Board::~Board()
 void Board::startSqui(sf::Vector2i& loc, int w, Color c)
 {
     scribs.push_back(new Squiggle(loc, w, c));
-    refresh = true;
     visibleScribs.push_back(scribs.back());
+    refresh = true;
 }
 
 void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
 {
-    refresh = refresh || scribs.back()->addPoint(loc, w, c);
+    refresh = scribs.back()->addPoint(loc, w, c);
 }
 
 void Board::compressSqui()
@@ -102,7 +103,7 @@ void Board::resize(int w, int h)
 
 void Board::draw(sf::RenderWindow& win)
 {
-    win.clear(sf::Color::White);
+    win.clear(backdrop.getSFColor());
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
         (*it)->draw(win); 
 }

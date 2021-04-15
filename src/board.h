@@ -6,10 +6,11 @@
 class Board
 {
 private:
-    //std::list<Squiggle*>::iterator furthestMark; //currently not in-use
     std::list<Squiggle*> scribs;
     std::list<Squiggle*> rScribs;
     std::list<Squiggle*> visibleScribs;
+
+    Color backdrop;
 
     std::string name;
     bool refresh;
