@@ -21,7 +21,7 @@ public:
         outline.setOutlineColor(Color(Color::Black).getSFColor());
         outline.setOutlineThickness(2);
         outline.setPosition(x, y);
-        visible = false;
+        visible = true;
     };
 
     sf::RectangleShape& getOutline()

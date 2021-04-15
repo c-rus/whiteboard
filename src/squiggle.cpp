@@ -7,6 +7,7 @@ Squiggle::Squiggle(sf::Vector2i& start, int radius, Color c)
     bounds = Box(start.x, start.y, radius*2, radius*2);
     optimized = false;
     scalar = 1;
+    points.push_back(std::make_pair(start, radius));
 }
 
 Squiggle::~Squiggle()
@@ -108,6 +109,7 @@ void Squiggle::move(sf::Vector2i& offset)
             l.setPosition(l.getPosition()+sf::Vector2f(offset));
         }
     }
+
     bounds.shift(offset.x, offset.y);
 }
 
@@ -134,7 +136,7 @@ void Squiggle::compress()
     optimized = true;
 }
 
-bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c)
+bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c, bool fromLoad)
 {
     if(prev == sf::Vector2f(p))
         return false;
@@ -168,7 +170,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c)
             lines.push_back(new Pixel(prev, r, c));
             int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
             int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
-            bounds.stretch(borderX, borderY);
+            if(!fromLoad) bounds.stretch(borderX, borderY);
         }
     }
     //choose y-axis as independent
@@ -185,16 +187,18 @@ bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c)
             lines.push_back(new Pixel(prev, r, c));
             int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
             int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
-            bounds.stretch(borderX, borderY);
+            if(!fromLoad) bounds.stretch(borderX, borderY);
         }
     }
 
     prev = sf::Vector2f(p);
+    points.push_back(std::make_pair(p, r));
     return true;
 }
 
 int Squiggle::count()
 {
+    std::cout << "dots: " << lines.size() << " vs points: " << points.size() << std::endl;
     return lines.size();
 }
 
@@ -205,6 +209,8 @@ Box& Squiggle::getBounds()
 
 Squiggle::Squiggle(std::fstream& file)
 {
+    optimized = false;
+
     unsigned int size = 0;
     file.read((char*)&size, sizeof(size));
 
@@ -240,8 +246,16 @@ Squiggle::Squiggle(std::fstream& file)
         file.read((char*)&localY, sizeof(localY));
         //radius
         file.read((char*)&radius, sizeof(radius));
-        sf::Vector2f location(x+localX, y+localY);
-        lines.push_back(new Pixel(location, radius, ink));
+        sf::Vector2i location(x+localX, y+localY);
+        if(i == 0) //start initial point
+        {
+            this->prev = sf::Vector2f(location);
+            std::cout << prev.x << " , " << prev.y << std::endl;
+            lines.push_back(new Pixel(prev, radius, ink));
+            points.push_back(std::make_pair(location, radius));
+        }
+        else //continuation points
+            addPoint(location, radius, ink, true);
     }
 
     scalar = 1;
@@ -249,7 +263,7 @@ Squiggle::Squiggle(std::fstream& file)
 
 void Squiggle::save(std::fstream& file)
 {
-    unsigned int size = lines.size();
+    unsigned int size = points.size();
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
 
     //save the bounds + global position
@@ -272,20 +286,20 @@ void Squiggle::save(std::fstream& file)
     file.write((char*)&b, sizeof(b));
     file.write((char*)&a, sizeof(a));
     
-    //save every pixel
+    //save every recorded point
     unsigned short localX = 0;
     unsigned short localY = 0;
     unsigned char radius = 0;
-    for(auto it = lines.begin(); it != lines.end(); it++)
+    for(auto it = points.begin(); it != points.end(); it++)
     {
-        Pixel& p = (**it);
+        auto& p = (*it);
         //location
-        localX = (unsigned short)p.getLocation().x;
-        localY = (unsigned short)p.getLocation().y;
+        localX = (unsigned short)p.first.x-bounds.getX();
+        localY = (unsigned short)p.first.y-bounds.getY();
         file.write((char*)&localX, sizeof(localX));
         file.write((char*)&localY, sizeof(localY));
         //radius
-        radius = (unsigned char)p.getRadius();
+        radius = (unsigned char)p.second;
         file.write((char*)&radius, sizeof(radius));
     }
 }

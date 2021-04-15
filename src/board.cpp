@@ -95,9 +95,8 @@ void Board::pan(sf::Vector2i& offset)
     }
     
     for(auto it = rScribs.begin(); it != rScribs.end(); it++)
-    {
         (*it)->move(offset);
-    }
+
     container.shift(offset.x, offset.y);
 }
 
@@ -150,6 +149,7 @@ void Board::clear()
     refresh = true;
     while(!scribs.empty())
     {
+        //int i = scribs.back()->count();
         delete scribs.back();
         scribs.pop_back();
     }
