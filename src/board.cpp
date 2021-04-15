@@ -16,6 +16,11 @@ Board::~Board()
     clear();
 }
 
+void Board::update()
+{
+    
+}
+
 void Board::startSelection(sf::Vector2i& loc)
 {
     selector.shift(loc.x-selector.getX(), loc.y-selector.getY());
@@ -25,12 +30,20 @@ void Board::startSelection(sf::Vector2i& loc)
 void Board::continueSelection(sf::Vector2i& loc)
 {
     auto& b = selector;
-    b.getOutline().setSize(sf::Vector2f(loc.x-b.getX(), loc.y-b.getY()));
+    b.adjust(loc.x-b.getOutline().getPosition().x, loc.y-b.getOutline().getPosition().y);
 }
 
 void Board::grabSelection()
 {
     selector.setVisibility(false);
+    selector.print();
+    for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
+    {
+        if(selector.intersect((*it)->getBounds()))
+        {
+            (*it)->getBounds().setVisibility(true);
+        }
+    }
 }
 
 void Board::startSqui(sf::Vector2i& loc, int w, Color c)
@@ -38,6 +51,7 @@ void Board::startSqui(sf::Vector2i& loc, int w, Color c)
     scribs.push_back(new Squiggle(loc, w, c));
     visibleScribs.push_back(scribs.back());
     refresh = true;
+    scribbling = true;
 }
 
 void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
@@ -121,9 +135,9 @@ void Board::resize(int w, int h)
 void Board::draw(sf::RenderWindow& win)
 {
     win.clear(backdrop.getSFColor());
-    selector.draw(win);
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
         (*it)->draw(win); 
+    selector.draw(win);
 }
 
 void Board::setName(std::string& n)

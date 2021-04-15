@@ -16,9 +16,10 @@ private:
     bool refresh;
     Box frame; //the visible window
     Box container; //the boundaries of the entire drawn art
-    Box selector;
+    Box selector; //selection box
     int width;
     int height;
+    bool scribbling;
 
     const int MAX_W = sf::VideoMode::getDesktopMode().width;
     const int MAX_H = sf::VideoMode::getDesktopMode().height;
@@ -28,6 +29,8 @@ public:
     Board(std::fstream& file, int w, int h, std::string title); //loading a board
     ~Board();
 
+    void update(); //TODO implement
+    
     void startSqui(sf::Vector2i& loc, int w, Color c);
     void continueSqui(sf::Vector2i& loc, int w, Color c);
     void compressSqui();

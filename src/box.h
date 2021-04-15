@@ -48,11 +48,43 @@ public:
 
     int getY() { return y; };
 
+    void adjust(int w, int h)
+    {
+        outline.setSize(sf::Vector2f(w, h));
+
+        if(w < 0)
+        {
+            x = outline.getPosition().x+w;
+            width = -w;
+        }
+        else
+        {
+            x = outline.getPosition().x;
+            width = w;
+        }
+
+        if(h < 0)
+        {
+            y = outline.getPosition().y+h;
+            height = -h;
+        }
+        else
+        {
+            y = outline.getPosition().y;
+            height = h;
+        }
+    };
+
     void shift(int a, int b)
     {
         x+=a;
         y+=b;
         outline.setPosition(x, y);
+    };
+
+    bool isVisible()
+    {
+        return visible;
     };
 
     void print()

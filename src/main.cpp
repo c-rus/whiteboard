@@ -113,9 +113,7 @@ int main(int argc, char ** argv)
                     canvas->compressSqui();
                 pressed = pan = false;
                 if(pen.getMode() == Stylus::SELECT)
-                {
-                    canvas->grabSelection();
-                }
+                    canvas->grabSelection(); //TODO implementation
             }
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
@@ -172,6 +170,7 @@ int main(int argc, char ** argv)
                 if(e.key.code == sf::Keyboard::LSystem) cmd = true;
                 else if(e.key.code == sf::Keyboard::Z && cmd) canvas->undo();
                 else if(e.key.code == sf::Keyboard::X && cmd) canvas->redo();
+                else if(e.key.code == sf::Keyboard::BackSpace && cmd) canvas->clear();
                 else if(e.key.code == sf::Keyboard::S && cmd) 
                 {
                     askforTitle = !fm.save(*canvas);
@@ -193,11 +192,13 @@ int main(int argc, char ** argv)
                 else if(e.key.code == sf::Keyboard::W)
                 {
                     //calculate origin
+                    //TODO: zoom feature
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
                     //canvas->zoom(1, origin);
                 }
                 else if(e.key.code == sf::Keyboard::Y)
                 {
+                    //TODO: zoom feature
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
                     //canvas->zoom(-1, origin);
                 }
@@ -237,7 +238,6 @@ int main(int argc, char ** argv)
                 {
                     window.setMouseCursor(pen.swapMode(Stylus::SELECT));
                 }
-                else if(e.key.code == sf::Keyboard::C) canvas->clear();
             }
             else if(e.type == sf::Event::KeyReleased)
             {
@@ -285,7 +285,6 @@ int main(int argc, char ** argv)
             }
         }
 
-        
         canvas->draw(window);
         hud.draw(window);
         window.display();
