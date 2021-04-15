@@ -109,9 +109,13 @@ int main(int argc, char ** argv)
             }
             else if(e.type == sf::Event::MouseButtonReleased)
             {
-                if(pressed && !pan) //finished a squiggle
+                if(pressed && !pan && pen.getMode() != Stylus::SELECT) //finished a squiggle
                     canvas->compressSqui();
                 pressed = pan = false;
+                if(pen.getMode() == Stylus::SELECT)
+                {
+                    canvas->grabSelection();
+                }
             }
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
             {
@@ -143,6 +147,10 @@ int main(int argc, char ** argv)
                     loc.x = loc.x - pen.getRadius();
                     loc.y = loc.y - pen.getRadius();
                     canvas->startSqui(loc, pen.getRadius(), Color::White);
+                }
+                else if(pen.getMode() == Stylus::SELECT)
+                {
+                    canvas->startSelection(loc);
                 }
                     
             }
@@ -225,6 +233,10 @@ int main(int argc, char ** argv)
                 {
                     window.setMouseCursor(pen.swapMode(Stylus::DRAW));
                 }
+                else if(e.key.code == sf::Keyboard::S)
+                {
+                    window.setMouseCursor(pen.swapMode(Stylus::SELECT));
+                }
                 else if(e.key.code == sf::Keyboard::C) canvas->clear();
             }
             else if(e.type == sf::Event::KeyReleased)
@@ -264,6 +276,9 @@ int main(int argc, char ** argv)
                     break;
                 case Stylus::ERASE:
                     canvas->continueSqui(loc, pen.getRadius(), Color::White);
+                    break;
+                case Stylus::SELECT:
+                    canvas->continueSelection(loc);
                     break;
                 default:
                     std::cout << "ERROR: Unknown mode." << std::endl;

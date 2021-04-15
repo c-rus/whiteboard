@@ -9,6 +9,7 @@ public:
     {
         DRAW,
         ERASE,
+        SELECT,
     };
 
 private:

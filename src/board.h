@@ -16,6 +16,7 @@ private:
     bool refresh;
     Box frame; //the visible window
     Box container; //the boundaries of the entire drawn art
+    Box selector;
     int width;
     int height;
 
@@ -44,6 +45,10 @@ public:
     void redo();
     void undo();
     void clear();
+
+    void startSelection(sf::Vector2i& loc);
+    void continueSelection(sf::Vector2i& loc);
+    void grabSelection();
 
     void deassertRefresh();
     void assertRefresh();

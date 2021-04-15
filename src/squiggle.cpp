@@ -22,6 +22,7 @@ Squiggle::~Squiggle()
 
 void Squiggle::draw(sf::RenderWindow& win)
 {
+    bounds.draw(win);
     if(optimized)
         win.draw(*sp);
     else

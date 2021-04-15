@@ -1,10 +1,13 @@
 #pragma once
 #include <iostream>
+#include "color.h"
 
 class Box
 {
 private:
     int width, height, x, y;
+    sf::RectangleShape outline;
+    bool visible;
 
 public:
     Box(int x=0, int y=0, int w=-1, int h=-1)
@@ -13,6 +16,28 @@ public:
         height = h;
         this->x = x;
         this->y = y;
+        outline.setSize(sf::Vector2f(width, height));
+        outline.setFillColor(Color(Color::Transparent).getSFColor());
+        outline.setOutlineColor(Color(Color::Black).getSFColor());
+        outline.setOutlineThickness(2);
+        outline.setPosition(x, y);
+        visible = false;
+    };
+
+    sf::RectangleShape& getOutline()
+    {
+        return outline;
+    };
+
+    void draw(sf::RenderWindow& win)
+    {
+        if(visible)
+            win.draw(outline);
+    };
+
+    void setVisibility(bool b)
+    {
+        visible = b;
     };
 
     int getWidth() { return width; };
@@ -27,13 +52,14 @@ public:
     {
         x+=a;
         y+=b;
-    }
+        outline.setPosition(x, y);
+    };
 
     void print()
     {
         std::cout << "x: " << x << " y: " << y;
         std::cout << "\t width: " << width << " height:" << height << std::endl; 
-    }
+    };
 
     bool stretch(int a, int b)
     {
@@ -64,8 +90,14 @@ public:
             triggered = true;
         }
 
+        if(triggered)
+        {
+            outline.setPosition(x, y);
+            outline.setSize(sf::Vector2f(width, height));
+        }
+
         return triggered;
-    }
+    };
 
     bool contains(Box& rhs)
     {

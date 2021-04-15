@@ -16,6 +16,23 @@ Board::~Board()
     clear();
 }
 
+void Board::startSelection(sf::Vector2i& loc)
+{
+    selector.shift(loc.x-selector.getX(), loc.y-selector.getY());
+    selector.setVisibility(true);
+}
+
+void Board::continueSelection(sf::Vector2i& loc)
+{
+    auto& b = selector;
+    b.getOutline().setSize(sf::Vector2f(loc.x-b.getX(), loc.y-b.getY()));
+}
+
+void Board::grabSelection()
+{
+    selector.setVisibility(false);
+}
+
 void Board::startSqui(sf::Vector2i& loc, int w, Color c)
 {
     scribs.push_back(new Squiggle(loc, w, c));
@@ -104,6 +121,7 @@ void Board::resize(int w, int h)
 void Board::draw(sf::RenderWindow& win)
 {
     win.clear(backdrop.getSFColor());
+    selector.draw(win);
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
         (*it)->draw(win); 
 }
