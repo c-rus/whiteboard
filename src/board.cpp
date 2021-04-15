@@ -40,9 +40,7 @@ void Board::grabSelection()
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
     {
         if(selector.intersect((*it)->getBounds()))
-        {
             (*it)->getBounds().setVisibility(true);
-        }
     }
 }
 

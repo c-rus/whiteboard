@@ -29,7 +29,7 @@ public:
     Squiggle(std::fstream& file); //loading from file
     ~Squiggle();
 
-    bool addPoint(sf::Vector2i& p, int radius, Color color, bool fromLoad=false);
+    bool addPoint(sf::Vector2i& p, int radius, Color color);
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
     void zoom(int scale, sf::Vector2f& origin);

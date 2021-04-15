@@ -143,7 +143,7 @@ void Squiggle::compress()
     optimized = true;
 }
 
-bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c, bool fromLoad)
+bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c)
 {
     if(prev == sf::Vector2f(p))
         return false;
@@ -177,7 +177,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c, bool fromLoad)
             lines.push_back(new Pixel(prev, r, c));
             int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
             int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
-            if(!fromLoad) bounds.stretch(borderX, borderY);
+            bounds.stretch(borderX, borderY);
         }
     }
     //choose y-axis as independent
@@ -194,7 +194,7 @@ bool Squiggle::addPoint(sf::Vector2i& p, int r, Color c, bool fromLoad)
             lines.push_back(new Pixel(prev, r, c));
             int borderY = (headedDown) ? prev.y+(2*r) : prev.y;
             int borderX = (headedRight) ? prev.x+(2*r) : prev.x;
-            if(!fromLoad) bounds.stretch(borderX, borderY);
+            bounds.stretch(borderX, borderY);
         }
     }
 
@@ -221,16 +221,12 @@ Squiggle::Squiggle(std::fstream& file)
     unsigned int size = 0;
     file.read((char*)&size, sizeof(size));
 
-    //what were the bounds again?
+    //where was the bounds again?
     int x = 0;
     file.read((char*)&x, sizeof(x));
     int y = 0;
     file.read((char*)&y, sizeof(y));
-    int w = -1;
-    file.read((char*)&w, sizeof(w));
-    int h = -1;
-    file.read((char*)&h, sizeof(h));
-    bounds = Box(x, y, w, h);
+    bounds = Box(x, y);
 
     //load the color of the squiggle
     unsigned char r = 0;
@@ -243,6 +239,7 @@ Squiggle::Squiggle(std::fstream& file)
     file.read((char*)&a, sizeof(a));
     Color ink(r, g, b, a);
     
+    //rebuild the lines
     unsigned short localX = 0;
     unsigned short localY = 0;
     unsigned char radius = 0;
@@ -257,12 +254,11 @@ Squiggle::Squiggle(std::fstream& file)
         if(i == 0) //start initial point
         {
             this->prev = sf::Vector2f(location);
-            std::cout << prev.x << " , " << prev.y << std::endl;
             lines.push_back(new Pixel(prev, radius, ink));
             points.push_back(std::make_pair(location, radius));
         }
         else //continuation points
-            addPoint(location, radius, ink, true);
+            addPoint(location, radius, ink);
     }
 
     scalar = 1;
@@ -273,14 +269,10 @@ void Squiggle::save(std::fstream& file)
     unsigned int size = points.size();
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
 
-    //save the bounds + global position
+    //save the global position
     int temp = bounds.getX();
     file.write((char*)&temp, sizeof(temp));
     temp = bounds.getY();
-    file.write((char*)&temp, sizeof(temp));
-    temp = bounds.getWidth();
-    file.write((char*)&temp, sizeof(temp));
-    temp = bounds.getHeight();
     file.write((char*)&temp, sizeof(temp));
 
     //save the color of the squiggle
