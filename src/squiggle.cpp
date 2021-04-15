@@ -110,6 +110,13 @@ void Squiggle::move(sf::Vector2i& offset)
         }
     }
 
+    //update points locations
+    for(auto it = points.begin(); it != points.end(); it++)
+    {
+        (*it).first.x += offset.x;
+        (*it).first.y += offset.y;
+    }
+
     bounds.shift(offset.x, offset.y);
 }
 
@@ -246,7 +253,7 @@ Squiggle::Squiggle(std::fstream& file)
         file.read((char*)&localY, sizeof(localY));
         //radius
         file.read((char*)&radius, sizeof(radius));
-        sf::Vector2i location(x+localX, y+localY);
+        sf::Vector2i location(localX+bounds.getX(), localY+bounds.getY());
         if(i == 0) //start initial point
         {
             this->prev = sf::Vector2f(location);
@@ -294,8 +301,8 @@ void Squiggle::save(std::fstream& file)
     {
         auto& p = (*it);
         //location
-        localX = (unsigned short)p.first.x-bounds.getX();
-        localY = (unsigned short)p.first.y-bounds.getY();
+        localX = (unsigned short)(p.first.x-bounds.getX());
+        localY = (unsigned short)(p.first.y-bounds.getY());
         file.write((char*)&localX, sizeof(localX));
         file.write((char*)&localY, sizeof(localY));
         //radius
