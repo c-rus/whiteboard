@@ -7,7 +7,7 @@
 #include "color.h"
 #include "box.h"
 #include "pixel.h"
-
+#include "huffmanTree.h"
 //a squiggle is made from a pair of points, with lines drawn from each successive pair
 class Squiggle
 {
@@ -33,5 +33,5 @@ public:
     void compress();
 
     Box& getBounds();
-    void save(std::fstream& file);
+    void save(std::fstream& file, HuffmanTree& ht);
 };

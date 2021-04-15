@@ -234,7 +234,7 @@ Squiggle::Squiggle(std::fstream& file)
         file.read((char*)&b, sizeof(b));
         file.read((char*)&a, sizeof(a));
         //radius
-        unsigned short radius = 0;
+        unsigned char radius = 0;
         file.read((char*)&radius, sizeof(radius));
         sf::Vector2f location(x, y);
         lines.push_back(new Pixel(location, radius, Color(r, g, b, a)));
@@ -243,10 +243,9 @@ Squiggle::Squiggle(std::fstream& file)
     compress();
 }
 
-void Squiggle::save(std::fstream& file)
+void Squiggle::save(std::fstream& file, HuffmanTree& ht)
 {
     int size = lines.size();
-    std::cout << size << std::endl;
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
 
     //save the bounds
@@ -269,6 +268,7 @@ void Squiggle::save(std::fstream& file)
         file.write((char*)&x, sizeof(x));
         file.write((char*)&y, sizeof(y));
         //color
+        ht.emplace(p.getColor());
         unsigned char r = p.getColor().GetR();
         unsigned char g = p.getColor().GetG();
         unsigned char b = p.getColor().GetB();
@@ -278,7 +278,7 @@ void Squiggle::save(std::fstream& file)
         file.write((char*)&b, sizeof(b));
         file.write((char*)&a, sizeof(a));
         //radius
-        unsigned short radius = (unsigned short)p.getRadius();
+        unsigned char radius = (unsigned char)p.getRadius();
         file.write((char*)&radius, sizeof(radius));
     }
 }

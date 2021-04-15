@@ -178,9 +178,32 @@ void Board::save(std::fstream& file)
     //how many squiggles?
     int sCount = scribs.size();
     file.write((char*)&sCount, sizeof(sCount));
+
+    HuffmanTree ht;
+
     //write all squiggles
     for(auto it = scribs.begin(); it != scribs.end(); it++)
     {
-        (*it)->save(file);
+        (*it)->save(file, ht);
+    }
+
+    ht.generate();
+    //save ht codes to the file
+    std::cout << "depth of ht: " << ht.getHeight() << std::endl;
+    std::queue<unsigned char> package = ht.encode();
+    std::queue<unsigned char> package2;
+    while(!package.empty())
+    {
+        std::cout << ht.transform(package.front()) << std::endl;
+        package2.push(package.front());
+        package.pop();
+    }
+    
+    std::cout << "unpacking..." << std::endl;
+    std::queue<Color> unpacked = ht.decode(package2);
+    while(!unpacked.empty())
+    {
+        std::cout << unpacked.front().GetHexValue() << std::endl;
+        unpacked.pop();
     }
 }

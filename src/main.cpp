@@ -12,10 +12,11 @@
 
 /*
 TODO: key outlooks
-    - draw only top-most pixel (use unordered_map or array)
+    - selection tool, draw a box and see if it contains a squiggle's bounds
+    - background canvas
     - open recent option (save settings to a file thats read on startup)
     - eraser feature (eraser is just drawing with the background color)
-    -everytime things are moved, try to fit into board's array (start with top squiggles)
+    - huffman encoding for pixel colors
 */
 int main(int argc, char ** argv)
 {
@@ -46,7 +47,7 @@ int main(int argc, char ** argv)
     std::string alert = "";
     bool capsLock = false;
 
-    Stylus pen(2, Color(0,0,0));
+    Stylus pen(2, Color::Black);
     window.setMouseCursor(pen.swapMode(pen.getMode())); //set initial cursor
 
     Board* canvas = fm.load(fileName, screenWidth, screenHeight);

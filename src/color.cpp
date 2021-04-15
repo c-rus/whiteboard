@@ -40,13 +40,13 @@ Color::Color(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
     B = b;
     A = a;
 
-    intVal = *format[3] & 255;
+    intVal = *format[0] & 255;
     intVal = intVal << 8;
-    intVal |= *format[2] & 255;
+    intVal |= (*format[1]) & 255;
     intVal = intVal << 8;
-    intVal |= *format[1] & 255;
+    intVal |= (*format[2]) & 255;
     intVal = intVal << 8;
-    intVal |= *format[0] & 255;
+    intVal |= (*format[3]) & 255;
 
     hexVal = "0x00000000";
     //iterate through each color value to assign two hexadecimal values per each
@@ -133,4 +133,8 @@ std::string Color::GetName() const
 sf::Color& Color::getSFColor()
 {
     return dye;
+}
+unsigned int Color::getIntValue() const
+{
+    return intVal;
 }

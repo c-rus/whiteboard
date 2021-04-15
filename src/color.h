@@ -51,6 +51,7 @@ public:
     unsigned char GetB() const;
     unsigned char GetA() const;
     std::string GetHexValue() const;
+    unsigned int getIntValue() const;
     std::string GetName() const;
 
     sf::Color& getSFColor();
