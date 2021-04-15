@@ -204,8 +204,7 @@ Box& Squiggle::getBounds()
 
 Squiggle::Squiggle(std::fstream& file)
 {
-    int size = 0;
-    scalar = 1;
+    unsigned int size = 0;
     file.read((char*)&size, sizeof(size));
 
     //what were the bounds again?
@@ -230,28 +229,30 @@ Squiggle::Squiggle(std::fstream& file)
     file.read((char*)&a, sizeof(a));
     Color ink(r, g, b, a);
     
-    for(int i = 0; i < size; i++)
+    unsigned short localX = 0;
+    unsigned short localY = 0;
+    unsigned char radius = 0;
+    for(unsigned int i = 0; i < size; i++)
     {
         //location
-        file.read((char*)&x, sizeof(x));
-        file.read((char*)&y, sizeof(y));
-
+        file.read((char*)&localX, sizeof(localX));
+        file.read((char*)&localY, sizeof(localY));
         //radius
-        unsigned char radius = 0;
         file.read((char*)&radius, sizeof(radius));
-        sf::Vector2f location(x, y);
+        sf::Vector2f location(x+localX, y+localY);
         lines.push_back(new Pixel(location, radius, ink));
     }
 
     compress();
+    scalar = 1;
 }
 
 void Squiggle::save(std::fstream& file)
 {
-    int size = lines.size();
+    unsigned int size = lines.size();
     file.write((char*)&size, sizeof(size)); //to remember how many points are in this squiggle
 
-    //save the bounds
+    //save the bounds + global position
     int temp = bounds.getX();
     file.write((char*)&temp, sizeof(temp));
     temp = bounds.getY();
@@ -272,16 +273,19 @@ void Squiggle::save(std::fstream& file)
     file.write((char*)&a, sizeof(a));
     
     //save every pixel
+    unsigned short localX = 0;
+    unsigned short localY = 0;
+    unsigned char radius = 0;
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         Pixel& p = (**it);
         //location
-        int x = p.getLocation().x+sp->getPosition().x;
-        int y = p.getLocation().y+sp->getPosition().y;
-        file.write((char*)&x, sizeof(x));
-        file.write((char*)&y, sizeof(y));
+        localX = (unsigned short)p.getLocation().x;
+        localY = (unsigned short)p.getLocation().y;
+        file.write((char*)&localX, sizeof(localX));
+        file.write((char*)&localY, sizeof(localY));
         //radius
-        unsigned char radius = (unsigned char)p.getRadius();
+        radius = (unsigned char)p.getRadius();
         file.write((char*)&radius, sizeof(radius));
     }
 }

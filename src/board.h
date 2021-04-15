@@ -2,7 +2,6 @@
 #include <list>
 #include "squiggle.h"
 #include <iostream>
-#include <unordered_map>
 
 class Board
 {
