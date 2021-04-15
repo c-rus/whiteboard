@@ -21,26 +21,6 @@ TODO: key outlooks
 int main(int argc, char ** argv)
 {
     std::string path = "./build/";
-    /*
-    //*uncomment to read out bmp file
-    std::fstream bmp("./build/all_gray.bmp", std::ios_base::in | std::ios_base::binary);
-    std::fstream output("./build/raw.txt", std::ios_base::out);
-    int spacing = 4;
-    int index = 0;
-    while(!bmp.eof())
-    {
-        unsigned int c = 0;
-        bmp.read((char*)&c, sizeof(c));
-        output << Color(c).GetHexValue() << " ";
-        index++;
-        if(index >= spacing)
-        {
-            index = 0;
-            output << std::endl;
-        }
-    }
-    return 0;
-    */
     FileManager fm(path);
 
     std::string fileName = "";
