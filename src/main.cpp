@@ -189,6 +189,14 @@ int main(int argc, char ** argv)
                 {
                     pen.setInk(Color::GreenAlt);
                 }
+                else if(e.key.code == sf::Keyboard::Num1)
+                {
+                    canvas->switchLines();
+                }
+                else if(e.key.code == sf::Keyboard::Num2)
+                {
+                    canvas->switchGrid();
+                }
                 else if(e.key.code == sf::Keyboard::W)
                 {
                     //calculate origin

@@ -9,6 +9,9 @@ Board::Board(int w, int h, std::string title)
     frame = Box(0, 0, width, height);
     container = Box(0,0);
     backdrop = Color::White;
+    gridWidth = 40;
+    gridVisible = false;
+    linesVisible = false;
 }
 
 Board::~Board()
@@ -19,6 +22,18 @@ Board::~Board()
 void Board::update()
 {
     
+}
+
+void Board::switchGrid()
+{
+    linesVisible = false;
+    gridVisible = !gridVisible;
+}
+
+void Board::switchLines()
+{
+    gridVisible = false;
+    linesVisible = !linesVisible;
 }
 
 void Board::startSelection(sf::Vector2i& loc)
@@ -96,6 +111,8 @@ void Board::pan(sf::Vector2i& offset)
         (*it)->move(offset);
 
     container.shift(offset.x, offset.y);
+    backOffset.x = (backOffset.x + offset.x) % gridWidth;
+    backOffset.y = (backOffset.y + offset.y) % gridWidth;
 }
 
 void Board::erase(sf::Vector2i& loc, int w)
@@ -132,6 +149,28 @@ void Board::resize(int w, int h)
 void Board::draw(sf::RenderWindow& win)
 {
     win.clear(backdrop.getSFColor());
+    
+    if(gridVisible)
+    {
+        for(int i = -gridWidth; i <= width; i+=gridWidth)
+        {
+            sf::RectangleShape gridline(sf::Vector2f(1, height+(2*gridWidth)));
+            gridline.setPosition(i+backOffset.x, -gridWidth+backOffset.y);
+            gridline.setFillColor(Color(Color::Gray).getSFColor());
+            win.draw(gridline);
+        }
+    }
+    if(linesVisible || gridVisible)
+    {
+        for(int j = -gridWidth; j <= height; j+=gridWidth)
+        {
+            sf::RectangleShape gridline(sf::Vector2f(width+(2*gridWidth), 1));
+            gridline.setPosition(-gridWidth+backOffset.x, j+backOffset.y);
+            gridline.setFillColor(Color(Color::Gray).getSFColor());
+            win.draw(gridline);
+        }
+    }
+
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
         (*it)->draw(win); 
     selector.draw(win);

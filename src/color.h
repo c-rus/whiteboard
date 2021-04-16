@@ -10,6 +10,7 @@ public:
     enum STD
     {
         Black = 255,
+        Gray = 471604479, //168430335,
         Red = 4278190335,
         White = 4294967295,
         Green = 16711935,

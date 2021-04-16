@@ -11,6 +11,10 @@ private:
     std::list<Squiggle*> visibleScribs;
 
     Color backdrop;
+    sf::Vector2i backOffset;
+    int gridWidth;
+    bool gridVisible;
+    bool linesVisible;
 
     std::string name;
     bool refresh;
@@ -56,6 +60,9 @@ public:
     void deassertRefresh();
     void assertRefresh();
     bool isRefreshing();
+
+    void switchGrid();
+    void switchLines();
 
     std::string& getName();
     void setName(std::string& n);
