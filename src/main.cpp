@@ -154,11 +154,12 @@ int main(int argc, char ** argv)
             }
             else if(e.type == sf::Event::MouseWheelMoved)
             {
-                int maxPace = 50;
+                int maxPace = 60;
                 int direction = (e.mouseWheel.delta < 0) ? -1 : 1;
                 if(scrollPace != 0 && scrollPace/abs(scrollPace) != direction)
                     direction = -direction;
-                scrollPace = 2*direction*e.mouseWheel.delta*e.mouseWheel.delta;
+                
+                scrollPace = 4*direction*e.mouseWheel.delta*e.mouseWheel.delta;
                 
                 if(abs(scrollPace) > maxPace)
                     scrollPace = maxPace*direction;

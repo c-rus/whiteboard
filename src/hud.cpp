@@ -5,7 +5,6 @@ HUD::HUD(int w, int h)
     //knobs.push_back(Clickable(10, 10, 64, 64));
     inspecting = knobs.end();
     counter = 0;
-    //knobs.push_back(Clickable(w-10-64, 10, 64, 64));
 }
 
 void HUD::resize(int w, int h)
