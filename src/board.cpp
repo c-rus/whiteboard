@@ -142,8 +142,14 @@ void Board::resize(int w, int h)
         height = h;
 
     frame = Box(0, 0, width, height);
-    std::cout << "WIDTH: " << width << std::endl;
-    std::cout << "HEIGHT: " << height << std::endl;
+    
+    //update visibility area
+    visibleScribs.clear();
+    for(auto it = scribs.begin(); it != scribs.end(); it++)
+    {
+        if(frame.intersect((*it)->getBounds()))
+            visibleScribs.push_back(*it);
+    }
 }
 
 void Board::draw(sf::RenderWindow& win)

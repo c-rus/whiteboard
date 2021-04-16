@@ -255,6 +255,7 @@ Squiggle::Squiggle(std::fstream& file)
         {
             this->prev = sf::Vector2f(location);
             lines.push_back(new Pixel(prev, radius, ink));
+            bounds.stretch(prev.x+radius*2, prev.y+radius*2);
             points.push_back(std::make_pair(location, radius));
         }
         else //continuation points

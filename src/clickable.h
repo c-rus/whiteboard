@@ -18,7 +18,7 @@ public:
         tx = new sf::Texture();
         tx->loadFromFile("./assets/reset.png");
         ft = new sf::Font();
-        ft->loadFromFile("./assets/Garage-LVvZ.ttf");
+        ft->loadFromFile("./assets/SF-Pro.otf");
         
         sp.setTexture(*tx);
         sp.setPosition(x, y);
@@ -46,6 +46,7 @@ public:
     void draw(sf::RenderWindow& win)
     {
         win.draw(sp);
+        win.draw(t);
         if(tipVisible)
         {
             sf::RectangleShape background;

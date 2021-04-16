@@ -11,6 +11,6 @@ private:
 public:
     FileManager(std::string& workDir);
 
-    Board* load(std::string& fname, int w, int h);
+    Board* load(std::string& fname, int w, int h, std::string title="");
     bool save(Board& b, bool force=false);
 };

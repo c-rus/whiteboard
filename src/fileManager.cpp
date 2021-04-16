@@ -6,10 +6,10 @@ FileManager::FileManager(std::string& workDir)
     this->fileDir = "";
 }
 
-Board* FileManager::load(std::string& fname, int w, int h)
+Board* FileManager::load(std::string& fname, int w, int h, std::string title)
 {
     if(fname.size() < 1)
-        return new Board(w, h);
+        return new Board(w, h, title);
     
     //does it have the proper extension? (optional) -parse extension
     std::string fileExt = "";
@@ -32,7 +32,7 @@ Board* FileManager::load(std::string& fname, int w, int h)
     //parsing actual file name
     int index = fname.find_last_of('/')+1;
     int len = (fname.find_last_of('.')!=-1) ? fname.find_last_of('.')-index : fname.size()-index;
-    std::string title = fname.substr(index, len);
+    title = fname.substr(index, len);
 
     //does that file exist?
     if(!file.is_open()) 

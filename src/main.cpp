@@ -30,10 +30,10 @@ int main(int argc, char ** argv)
             fileName = std::string(argv[i]);
     }
 
-    std::string title = "Whiteboard";
+    std::string appTitle = "Whiteboard";
     int screenWidth = 1200;
     int screenHeight = 900;
-    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), title);
+    sf::RenderWindow window(sf::VideoMode(screenWidth, screenHeight), appTitle);
     sf::Image icn;
     icn.loadFromFile("./assets/icon.png");
     window.setIcon(32, 32, icn.getPixelsPtr());
@@ -46,11 +46,17 @@ int main(int argc, char ** argv)
     std::string name = "";
     std::string alert = "";
     bool capsLock = false;
+    sf::Font ft;
+    ft.loadFromFile("./assets/fonts/SF-Pro.otf");
+    sf::Text t;
+    t.setFont(ft);
+    t.setFillColor(sf::Color::Black);
+    t.setString("welcome to whiteboard!");
 
     Stylus pen(2, Color::Black);
     window.setMouseCursor(pen.swapMode(pen.getMode())); //set initial cursor
 
-    Board* canvas = fm.load(fileName, screenWidth, screenHeight);
+    Board* canvas = fm.load(fileName, screenWidth, screenHeight, name);
     HUD hud(screenWidth, screenHeight);
 
     bool pressed, pan, cmd, scrolling;
@@ -66,9 +72,9 @@ int main(int argc, char ** argv)
         scrolling = false;
 
         if(!upToDate)
-            window.setTitle(canvas->getName() + "* - " + title + alert);
+            window.setTitle(canvas->getName() + "* - " + appTitle + alert);
         else
-            window.setTitle(canvas->getName() + " - " + title);
+            window.setTitle(canvas->getName() + " - " + appTitle);
 
         sf::Event e;
         while(window.pollEvent(e))
@@ -296,6 +302,7 @@ int main(int argc, char ** argv)
 
         canvas->draw(window);
         hud.draw(window);
+        window.draw(t);
         window.display();
     }
 
