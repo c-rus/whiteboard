@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
                 }
                     
             }
-            else if(e.type == sf::Event::MouseWheelMoved)
+            else if(e.type == sf::Event::MouseWheelMoved && !pan)
             {
                 int maxPace = 60;
                 int direction = (e.mouseWheel.delta < 0) ? -1 : 1;
