@@ -47,6 +47,9 @@ public:
     //light erase- only erase top-level squiggle components
     //deep erase- erase all-level squiggle components
     //squi erase- erase the whole squiggle thats in contact with eraser
+    
+    //tip: if the squiggle boundary contains that eraser squiggle->
+    //draw the eraser squiggle inside the squiggle boundaries
     void erase(sf::Vector2i& loc, int w);
 
     void resize(int w, int h);
