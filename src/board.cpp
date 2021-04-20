@@ -12,6 +12,7 @@ Board::Board(int w, int h, std::string title)
     gridWidth = 40;
     gridVisible = false;
     linesVisible = false;
+    selecting = false;
 }
 
 Board::~Board()
@@ -38,8 +39,24 @@ void Board::switchLines()
 
 void Board::startSelection(sf::Vector2i& loc)
 {
+    selecting = true;
     selector.shift(loc.x-selector.getX(), loc.y-selector.getY());
     selector.setVisibility(true);
+}
+
+void Board::clearSelection()
+{
+    for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
+    {
+        if((*it)->getBounds().isVisible())
+            selecting = false;
+        (*it)->getBounds().setVisibility(false);
+    }
+}
+
+bool Board::isSelected()
+{
+    return selecting;
 }
 
 void Board::continueSelection(sf::Vector2i& loc)
@@ -52,10 +69,14 @@ void Board::grabSelection()
 {
     selector.setVisibility(false);
     selector.print();
+    selecting = false;
     for(auto it = visibleScribs.begin(); it != visibleScribs.end(); it++)
     {
         if(selector.intersect((*it)->getBounds()))
+        {
             (*it)->getBounds().setVisibility(true);
+            selecting = true;
+        }
     }
 }
 

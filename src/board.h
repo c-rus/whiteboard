@@ -24,6 +24,7 @@ private:
     int width;
     int height;
     bool scribbling;
+    bool selecting;
 
     const int MAX_W = sf::VideoMode::getDesktopMode().width;
     const int MAX_H = sf::VideoMode::getDesktopMode().height;
@@ -56,6 +57,8 @@ public:
     void startSelection(sf::Vector2i& loc);
     void continueSelection(sf::Vector2i& loc);
     void grabSelection();
+    bool isSelected();
+    void clearSelection();
 
     void deassertRefresh();
     void assertRefresh();

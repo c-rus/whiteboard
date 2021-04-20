@@ -118,7 +118,7 @@ int main(int argc, char ** argv)
                 if(pressed && !pan && pen.getMode() != Stylus::SELECT) //finished a squiggle
                     canvas->compressSqui();
                 pressed = pan = false;
-                if(pen.getMode() == Stylus::SELECT)
+                if(pen.getMode() == Stylus::SELECT && canvas->isSelected())
                     canvas->grabSelection(); //TODO implementation
             }
             else if(!pressed && !pan && e.type == sf::Event::MouseMoved)
@@ -131,11 +131,16 @@ int main(int argc, char ** argv)
                 loc = sf::Mouse::getPosition(window);
                 if(hud.interact(loc, *canvas))
                     continue;
-                
+                if(canvas->isSelected())
+                {
+                    canvas->clearSelection();
+                    continue;
+                }
+
                 pressed = true;
                 prevLoc = loc;
                 diff = sf::Vector2i(0,0);
-
+                
                 if(sf::Mouse::isButtonPressed(sf::Mouse::Right))
                     pan = true;
                 else if(pen.getMode() == Stylus::DRAW)
