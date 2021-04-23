@@ -20,7 +20,7 @@ TODO: key outlooks
 */
 int main(int argc, char ** argv)
 {
-    std::string path = "./build/";
+    std::string path = "./data/";
     FileManager fm(path);
 
     std::string fileName = "";
