@@ -11,6 +11,7 @@ private:
     std::list<Squiggle*> visibleScribs;
 
     Color backdrop;
+    //save where the grid located to keep things aligned
     sf::Vector2i backOffset;
     int gridWidth;
     bool gridVisible;
@@ -21,6 +22,7 @@ private:
     Box frame; //the visible window
     Box container; //the boundaries of the entire drawn art
     Box selector; //selection box
+    
     int width;
     int height;
     bool scribbling;

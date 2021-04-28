@@ -1,4 +1,5 @@
 APP_NAME = Whiteboard
+op=
 
 .PHONY: build
 build:
@@ -6,7 +7,7 @@ build:
 
 .PHONY: run
 run:
-	cd ./build/whiteboard
+	./build/whiteboard $(op)
 
 .PHONY: deploy
 deploy:
@@ -29,3 +30,8 @@ deploy:
 release:
 	make build
 	make deploy
+
+.PHONY: proto
+proto:
+	mkdir -p ./deploy/Prototype.app/Contents/MacOS
+	cp ./build/whiteboard ./deploy/Prototype.app/Contents/MacOS/Prototype

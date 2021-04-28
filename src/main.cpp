@@ -20,15 +20,18 @@ TODO: key outlooks
 */
 int main(int argc, char ** argv)
 {
-    std::string path = "./data/";
-    FileManager fm(path);
-
+    std::string path = "";
+    std::string workPath = ""; //currently not used
     std::string fileName = "";
     for(int i = 0; i < argc; i++)
     {
-        if(i == 1) //try to load this file path
+        if(i == 2) //try to load this file path
             fileName = std::string(argv[i]);
+        if(i == 1)
+            workPath = std::string(argv[i]);
     }
+    std::cout << "trying to load file: " << fileName << std::endl;
+    FileManager fm(path);
 
     std::string appTitle = "Whiteboard";
     int screenWidth = 1200;

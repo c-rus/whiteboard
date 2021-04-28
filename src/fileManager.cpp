@@ -28,7 +28,7 @@ Board* FileManager::load(std::string& fname, int w, int h, std::string title)
         fileDir = fname.substr(slash1, slash2-slash1+1);
 
     std::fstream file(workDir+fname, std::ios_base::in | std::ios_base::binary);
-
+    std::cout << "actual filepath: " << workDir + fname << std::endl;
     //parsing actual file name
     int index = fname.find_last_of('/')+1;
     int len = (fname.find_last_of('.')!=-1) ? fname.find_last_of('.')-index : fname.size()-index;
@@ -54,7 +54,7 @@ bool FileManager::save(Board& b, bool force)
 {
     if(!force)
     {
-        std::fstream fileExist(workDir+fileDir+b.getName()+ext, std::ios_base::in);
+        std::fstream fileExist("./data/"+b.getName()+ext, std::ios_base::in);
         if(!fileExist.is_open())
         {
             std::cout << "file does not exist!" << std::endl;
@@ -63,7 +63,7 @@ bool FileManager::save(Board& b, bool force)
         fileExist.close();
     }
 
-    std::fstream file(workDir+fileDir+b.getName()+ext, std::ios_base::out | std::ios_base::binary);
+    std::fstream file("./data/"+b.getName()+ext, std::ios_base::out | std::ios_base::binary);
     b.save(file);
     return true;
 }

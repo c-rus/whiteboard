@@ -271,6 +271,13 @@ bool Board::isRefreshing()
 
 Board::Board(std::fstream& file, int w, int h, std::string title) : Board(w, h, title)
 {
+    //read in grid coordinates
+    char offset = 0;
+    file.read((char*)&offset, sizeof(offset));
+    backOffset.x = offset;
+    file.read((char*)&offset, sizeof(offset));
+    backOffset.y = offset;
+    
     int sCount = 0;
     file.read((char*)&sCount, sizeof(sCount));
 
@@ -286,6 +293,12 @@ Board::Board(std::fstream& file, int w, int h, std::string title) : Board(w, h, 
 
 void Board::save(std::fstream& file)
 {
+    //save backoffset coordinates
+    char gridPos = backOffset.x;
+    file.write((char*)&gridPos, sizeof(gridPos));
+    gridPos = backOffset.y;
+    file.write((char*)&gridPos, sizeof(gridPos));
+
     //how many squiggles?
     int sCount = scribs.size();
     file.write((char*)&sCount, sizeof(sCount));
