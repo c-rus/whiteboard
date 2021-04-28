@@ -66,6 +66,7 @@ int main(int argc, char ** argv)
                         green- G\n\
                         black- B\n\
                         orange- O\n\
+                        yellow- y\n\
                         undo- CMD+Z\n\
                         redo- CMD+X\n\
                         clear- CMD+DEL\n\
@@ -240,7 +241,7 @@ int main(int argc, char ** argv)
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
                     //canvas->zoom(1, origin);
                 }
-                else if(e.key.code == sf::Keyboard::Y)
+                else if(e.key.code == sf::Keyboard::I)
                 {
                     //TODO: zoom feature
                     sf::Vector2f origin(float(window.getSize().x/2), float(window.getSize().y/2));
@@ -253,6 +254,10 @@ int main(int argc, char ** argv)
                 else if(e.key.code == sf::Keyboard::O)
                 {
                     pen.setInk(Color::Orange);
+                }
+                else if(e.key.code == sf::Keyboard::Y)
+                {
+                    pen.setInk(Color::Yellow);
                 }
                 else if(e.key.code == sf::Keyboard::R)
                 {

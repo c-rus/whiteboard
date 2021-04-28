@@ -1,4 +1,7 @@
-APP_NAME = whiteboard
+APP_NAME=whiteboard
+PROJECT_PATH=$(PWD)/deploy
+APP_PATH=/Applications/$(APP_NAME).app
+
 op=
 
 .PHONY: build
@@ -12,27 +15,17 @@ run:
 .PHONY: deploy
 deploy:
 # copy executable
-	cp ./build/whiteboard ./deploy/$(APP_NAME).app/Contents/Resources/whiteboard
+	cp ./build/whiteboard $(APP_PATH)/Contents/Resources/whiteboard
 # copy assets
-	rm -r ./deploy/$(APP_NAME).app/Contents/Resources/assets/
-	mkdir ./deploy/$(APP_NAME).app/Contents/Resources/assets/
-	cp -r ./assets/. ./deploy/$(APP_NAME).app/Contents/Resources/assets/.
+	rm -r $(APP_PATH)/Contents/Resources/assets/
+	mkdir $(APP_PATH)/Contents/Resources/assets/
+	cp -r ./assets/. $(APP_PATH)/Contents/Resources/assets/.
 #copy data folder (config settings, pages)
-	rm -r ./deploy/$(APP_NAME).app/Contents/Resources/data/
-	mkdir ./deploy/$(APP_NAME).app/Contents/Resources/data/
-	cp -r ./build/data/. ./deploy/$(APP_NAME).app/Contents/Resources/data/.
-# copy application
-	rm -r ~/../../Applications/$(APP_NAME).app/
-	mkdir ~/../../Applications/$(APP_NAME).app/
-	cp -r ./deploy/$(APP_NAME).app/. ~/../../Applications/$(APP_NAME).app/.
+	rm -r $(APP_PATH)/Contents/Resources/data/
+	mkdir $(APP_PATH)/Contents/Resources/data/
+	cp -r ./build/data/. $(APP_PATH)/Contents/Resources/data/.
 
 .PHONY: release
 release:
 	make build
 	make deploy
-	make zipper
-
-.PHONY: zipper
-zipper:
-# zip app component for itch.io
-	cd ./deploy; zip -r ./whiteboard.zip ./whiteboard.app

@@ -16,6 +16,7 @@ public:
         Green = 16711935,
         GreenAlt = 583541503,
         Blue = 65535,
+        Yellow = 4294902015,
         Orange = 4289003775,
         Transparent = 0,
     };
