@@ -5,7 +5,8 @@
 class FileManager
 {
 private:
-    std::string workDir, fileDir;
+    std::string workDir, fileDir, fullDir;
+    bool loadedFile;
     const std::string ext = ".wb";
 
 public:

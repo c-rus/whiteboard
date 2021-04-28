@@ -4,6 +4,8 @@ FileManager::FileManager(std::string& workDir)
 {
     this->workDir = workDir;
     this->fileDir = "";
+    this->fullDir = "";
+    loadedFile = false;
 }
 
 Board* FileManager::load(std::string& fname, int w, int h, std::string title)
@@ -47,11 +49,25 @@ Board* FileManager::load(std::string& fname, int w, int h, std::string title)
     }
     //load from file if so
     std::cout << "Load successful!" << std::endl;
+    loadedFile = true;
+    fullDir = fname;
     return new Board(file, w, h, title);
 }
 
 bool FileManager::save(Board& b, bool force)
 {
+    if(loadedFile)
+    {
+        std::fstream altFile(fullDir, std::ios_base::in);
+        if(altFile.is_open())
+        {
+            altFile.close();
+            std::fstream saveFile(fullDir, std::ios_base::out | std::ios_base::binary);
+            b.save(saveFile);
+            return true;
+        }
+    }
+
     if(!force)
     {
         std::fstream fileExist("./data/"+b.getName()+ext, std::ios_base::in);

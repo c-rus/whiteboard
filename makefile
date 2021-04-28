@@ -1,4 +1,4 @@
-APP_NAME = Whiteboard
+APP_NAME = whiteboard
 op=
 
 .PHONY: build
@@ -20,7 +20,7 @@ deploy:
 #copy data folder (config settings, pages)
 	rm -r ./deploy/$(APP_NAME).app/Contents/Resources/data/
 	mkdir ./deploy/$(APP_NAME).app/Contents/Resources/data/
-	cp -r ./data/. ./deploy/$(APP_NAME).app/Contents/Resources/data/.
+	cp -r ./build/data/. ./deploy/$(APP_NAME).app/Contents/Resources/data/.
 # copy application
 	rm -r ~/../../Applications/$(APP_NAME).app/
 	mkdir ~/../../Applications/$(APP_NAME).app/
@@ -30,8 +30,3 @@ deploy:
 release:
 	make build
 	make deploy
-
-.PHONY: proto
-proto:
-	mkdir -p ./deploy/Prototype.app/Contents/MacOS
-	cp ./build/whiteboard ./deploy/Prototype.app/Contents/MacOS/Prototype
