@@ -7,7 +7,7 @@ build:
 
 .PHONY: run
 run:
-	./build/whiteboard $(op)
+	./build/whiteboard ./data ./data/$(op)
 
 .PHONY: deploy
 deploy:
