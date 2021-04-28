@@ -30,3 +30,9 @@ deploy:
 release:
 	make build
 	make deploy
+	make zipper
+
+.PHONY: zipper
+zipper:
+# zip app component for itch.io
+	cd ./deploy; zip -r ./whiteboard.zip ./whiteboard.app
