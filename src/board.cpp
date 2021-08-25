@@ -82,6 +82,9 @@ void Board::grabSelection()
 
 void Board::startSqui(sf::Vector2i& loc, int w, Color c)
 {
+    if(c == getBackdrop())
+        std::cout << "erasing!" << std::endl;
+        
     scribs.push_back(new Squiggle(loc, w, c));
     visibleScribs.push_back(scribs.back());
     refresh = true;
@@ -148,6 +151,11 @@ void Board::erase(sf::Vector2i& loc, int w)
         else
             std::cout << "scribble is out of bounds" << std::endl;
     }
+}
+
+Color& Board::getBackdrop()
+{
+    return backdrop;
 }
 
 void Board::resize(int w, int h)

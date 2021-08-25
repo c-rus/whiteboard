@@ -76,4 +76,5 @@ public:
     void setName(std::string& n);
 
     void save(std::fstream& file);
+    Color& getBackdrop();
 };

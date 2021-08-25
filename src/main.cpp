@@ -179,7 +179,8 @@ int main(int argc, char ** argv)
                     //center the brush on the cursor
                     loc.x = loc.x - pen.getRadius();
                     loc.y = loc.y - pen.getRadius();
-                    canvas->startSqui(loc, pen.getRadius(), Color::White);
+                    //a squiggle thats an eraser must also draw the guidelines pattern +show/hide it
+                    canvas->startSqui(loc, pen.getRadius(), canvas->getBackdrop());
                 }
                 else if(pen.getMode() == Stylus::SELECT)
                 {
@@ -324,7 +325,7 @@ int main(int argc, char ** argv)
                     canvas->continueSqui(loc, pen.getRadius(), pen.getInk());
                     break;
                 case Stylus::ERASE:
-                    canvas->continueSqui(loc, pen.getRadius(), Color::White);
+                    canvas->continueSqui(loc, pen.getRadius(), canvas->getBackdrop());
                     break;
                 case Stylus::SELECT:
                     canvas->continueSelection(loc);
