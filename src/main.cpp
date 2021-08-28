@@ -59,7 +59,7 @@ int main(int argc, char ** argv)
                         decrease brush- DOWN\n\
                         pan- RT-CLICK+DRAG\n\
                         scroll- MOUSE-WHEEL\n\
-                        straight line- HOLD M\n\
+                        toggle straight line- M\n\
                         draw- D\n\
                         erase- E\n\
                         select- S\n\
@@ -243,7 +243,7 @@ int main(int argc, char ** argv)
                 }
                 else if (e.key.code == sf::Keyboard::M)
                 {
-                    canvas->toggleStraightEdge(true);
+                    canvas->toggleStraightEdge();
                 }
                 else if(e.key.code == sf::Keyboard::W)
                 {
@@ -305,11 +305,6 @@ int main(int argc, char ** argv)
 
                 if(e.key.code == sf::Keyboard::LShift || 
                    e.key.code == sf::Keyboard::RShift) capsLock = false;
-
-                if(e.key.code == sf::Keyboard::M)
-                {
-                    canvas->toggleStraightEdge(false);
-                }
             }
         }
 

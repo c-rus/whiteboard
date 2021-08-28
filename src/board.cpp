@@ -108,9 +108,9 @@ void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
     refresh = scribs.back()->addPoint(loc, w, c);
 }
 
-void Board::toggleStraightEdge(bool b)
+void Board::toggleStraightEdge()
 {
-    isStraight = b;
+    isStraight = !isStraight;
 }
 
 void Board::compressSqui()

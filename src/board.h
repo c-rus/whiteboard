@@ -45,7 +45,7 @@ public:
     void continueSqui(sf::Vector2i& loc, int w, Color c);
     void compressSqui();
 
-    void toggleStraightEdge(bool b);
+    void toggleStraightEdge();
 
     void draw(sf::RenderWindow& win);
     void zoom(int scale, sf::Vector2f& origin);
