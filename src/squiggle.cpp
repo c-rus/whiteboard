@@ -143,6 +143,7 @@ void Squiggle::compress(bool isStraight)
         bounds = Box(initial->getLocation().x, initial->getLocation().y, initial->getRadius()*2, initial->getRadius()*2);
         //add the initial point
         lines.push_back(initial);
+        points.push_back(std::make_pair(sf::Vector2i(initial->getLocation().x, initial->getLocation().y), initial->getRadius()));
         this->prev = initial->getLocation();
         //add intermediate points between beginning and final points
         sf::Vector2i pos = sf::Vector2i(int(final->getLocation().x), int(final->getLocation().y));
