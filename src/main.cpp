@@ -52,8 +52,9 @@ int main(int argc, char ** argv)
     ft.loadFromFile("./assets/fonts/SF-Pro.otf");
 
     std::string tips = "welcome to whiteboard!\n\
-                        grid- 1\n\
-                        lines- 2\n\
+                        lines- 1\n\
+                        grid- 2\n\
+                        isometric- 3\n\
                         increase brush- UP\n\
                         decrease brush- DOWN\n\
                         pan- RT-CLICK+DRAG\n\
@@ -234,6 +235,10 @@ int main(int argc, char ** argv)
                 else if(e.key.code == sf::Keyboard::Num2)
                 {
                     canvas->switchGrid();
+                }
+                else if(e.key.code == sf::Keyboard::Num3)
+                {
+                    canvas->switchIsometric();
                 }
                 else if(e.key.code == sf::Keyboard::W)
                 {

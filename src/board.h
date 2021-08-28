@@ -14,8 +14,10 @@ private:
     //save where the grid located to keep things aligned
     sf::Vector2i backOffset;
     int gridWidth;
+    float extraIsoDistance;
     bool gridVisible;
     bool linesVisible;
+    bool isometricVisible;
 
     std::string name;
     bool refresh;
@@ -71,6 +73,7 @@ public:
 
     void switchGrid();
     void switchLines();
+    void switchIsometric();
 
     std::string& getName();
     void setName(std::string& n);

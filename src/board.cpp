@@ -10,8 +10,10 @@ Board::Board(int w, int h, std::string title)
     container = Box(0,0);
     backdrop = Color::White;
     gridWidth = 40;
+    extraIsoDistance = (width+(2*gridWidth))/(0.5);
     gridVisible = false;
     linesVisible = false;
+    isometricVisible = false;
     selecting = false;
 }
 
@@ -28,12 +30,21 @@ void Board::update()
 void Board::switchGrid()
 {
     linesVisible = false;
+    isometricVisible  = false;
     gridVisible = !gridVisible;
+}
+
+void Board::switchIsometric()
+{
+    linesVisible = false;
+    gridVisible = false;
+    isometricVisible = !isometricVisible;
 }
 
 void Board::switchLines()
 {
     gridVisible = false;
+    isometricVisible = false;
     linesVisible = !linesVisible;
 }
 
@@ -179,13 +190,14 @@ void Board::resize(int w, int h)
         if(frame.intersect((*it)->getBounds()))
             visibleScribs.push_back(*it);
     }
+    extraIsoDistance = (width+(2*gridWidth))/(0.5);
 }
 
 void Board::draw(sf::RenderWindow& win)
 {
     win.clear(backdrop.getSFColor());
     
-    if(gridVisible)
+    if(gridVisible || isometricVisible)
     {
         for(int i = -gridWidth; i <= width; i+=gridWidth)
         {
@@ -203,6 +215,27 @@ void Board::draw(sf::RenderWindow& win)
             gridline.setPosition(-gridWidth+backOffset.x, j+backOffset.y);
             gridline.setFillColor(Color(Color::Gray).getSFColor());
             win.draw(gridline);
+        }
+    }
+    if(isometricVisible)
+    {
+        for(int j = -int(extraIsoDistance); j <= gridWidth+width; j+=gridWidth)
+        {
+            //draw downward slopes
+            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance));
+            isoline.setPosition(j+backOffset.x, -gridWidth+backOffset.y);
+            isoline.setFillColor(Color(Color::Gray).getSFColor());
+            isoline.setRotation(-60);
+            win.draw(isoline);
+        }
+        for(int j = 0; j <= int(extraIsoDistance)+width; j+=gridWidth)
+        {
+            //draw upward slopes
+            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance));
+            isoline.setPosition(j+backOffset.x, -gridWidth+backOffset.y);
+            isoline.setFillColor(Color(Color::Gray).getSFColor());
+            isoline.setRotation(60);
+            win.draw(isoline);
         }
     }
 
