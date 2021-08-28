@@ -120,20 +120,48 @@ void Squiggle::move(sf::Vector2i& offset)
     bounds.shift(offset.x, offset.y);
 }
 
-void Squiggle::compress()
+void Squiggle::compress(bool isStraight)
 {
     //create render texture
     rt = new sf::RenderTexture();
+
+    //only connect the beginning and end points
+    if(isStraight)
+    {
+        //capture initial point
+        Pixel* initial = new Pixel(lines.front()->getLocation(), lines.front()->getRadius(), lines.front()->getColor());
+        //capture endpoint
+        Pixel* final = new Pixel(lines.back()->getLocation(), lines.back()->getRadius(), lines.back()->getColor());
+
+        //reset lines list
+        while(!lines.empty())
+        {
+            delete lines.back();
+            lines.pop_back();
+        }
+        //reset bounds
+        bounds = Box(initial->getLocation().x, initial->getLocation().y, initial->getRadius()*2, initial->getRadius()*2);
+        //add the initial point
+        lines.push_back(initial);
+        this->prev = initial->getLocation();
+        //add intermediate points between beginning and final points
+        sf::Vector2i pos = sf::Vector2i(int(final->getLocation().x), int(final->getLocation().y));
+        this->addPoint(pos, final->getRadius(), final->getColor());
+    }
+
     rt->create(bounds.getWidth(), bounds.getHeight());
     rt->clear(Color(0,0,0,0).getSFColor());
+    
     //traverse the list of pixels into a single texture
     for(auto it = lines.begin(); it != lines.end(); it++)
     {
         Pixel& p = (**it);
         p.setLocation(p.getLocation()-sf::Vector2f(bounds.getX(), bounds.getY()));
         rt->draw(p.getDot());
-        (*it)->drop(); //delete the dynamically allocated sfml shape (no longer needed)
+        //delete the dynamically allocated sfml shape (no longer needed)
+        (*it)->drop(); 
     }
+
     //set the texture to a sprite to handle for future drawing to screen
     rt->display();
     sp = new sf::Sprite();

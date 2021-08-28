@@ -33,8 +33,9 @@ public:
     void draw(sf::RenderWindow&  win);
     void move(sf::Vector2i& offset);
     void zoom(int scale, sf::Vector2f& origin);
+
     int count();
-    void compress();
+    void compress(bool isStraight);
 
     Box& getBounds();
     void save(std::fstream& file);

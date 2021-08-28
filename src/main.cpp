@@ -59,6 +59,7 @@ int main(int argc, char ** argv)
                         decrease brush- DOWN\n\
                         pan- RT-CLICK+DRAG\n\
                         scroll- MOUSE-WHEEL\n\
+                        straight line- HOLD M\n\
                         draw- D\n\
                         erase- E\n\
                         select- S\n\
@@ -240,6 +241,10 @@ int main(int argc, char ** argv)
                 {
                     canvas->switchIsometric();
                 }
+                else if (e.key.code == sf::Keyboard::M)
+                {
+                    canvas->toggleStraightEdge(true);
+                }
                 else if(e.key.code == sf::Keyboard::W)
                 {
                     //calculate origin
@@ -300,6 +305,11 @@ int main(int argc, char ** argv)
 
                 if(e.key.code == sf::Keyboard::LShift || 
                    e.key.code == sf::Keyboard::RShift) capsLock = false;
+
+                if(e.key.code == sf::Keyboard::M)
+                {
+                    canvas->toggleStraightEdge(false);
+                }
             }
         }
 

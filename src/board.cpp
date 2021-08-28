@@ -15,6 +15,7 @@ Board::Board(int w, int h, std::string title)
     linesVisible = false;
     isometricVisible = false;
     selecting = false;
+    isStraight = false;
 }
 
 Board::~Board()
@@ -107,9 +108,14 @@ void Board::continueSqui(sf::Vector2i& loc, int w, Color c)
     refresh = scribs.back()->addPoint(loc, w, c);
 }
 
+void Board::toggleStraightEdge(bool b)
+{
+    isStraight = b;
+}
+
 void Board::compressSqui()
 {
-    scribs.back()->compress();
+    scribs.back()->compress(isStraight);
     //update container
     Box& b = scribs.back()->getBounds();
     if(container.getWidth() == -1 && container.getHeight() == -1)

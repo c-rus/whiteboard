@@ -18,6 +18,7 @@ private:
     bool gridVisible;
     bool linesVisible;
     bool isometricVisible;
+    bool isStraight;
 
     std::string name;
     bool refresh;
@@ -43,6 +44,8 @@ public:
     void startSqui(sf::Vector2i& loc, int w, Color c);
     void continueSqui(sf::Vector2i& loc, int w, Color c);
     void compressSqui();
+
+    void toggleStraightEdge(bool b);
 
     void draw(sf::RenderWindow& win);
     void zoom(int scale, sf::Vector2f& origin);
