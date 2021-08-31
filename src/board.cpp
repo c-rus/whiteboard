@@ -10,7 +10,7 @@ Board::Board(int w, int h, std::string title)
     container = Box(0,0);
     backdrop = Color::White;
     gridWidth = 40;
-    extraIsoDistance = (width+(2*gridWidth))/(0.5);
+    extraIsoDistance = (2*gridWidth)/(0.5);
     gridVisible = false;
     linesVisible = false;
     isometricVisible = false;
@@ -196,14 +196,14 @@ void Board::resize(int w, int h)
         if(frame.intersect((*it)->getBounds()))
             visibleScribs.push_back(*it);
     }
-    extraIsoDistance = (width+(2*gridWidth))/(0.5);
+
 }
 
 void Board::draw(sf::RenderWindow& win)
 {
     win.clear(backdrop.getSFColor());
     
-    if(gridVisible || isometricVisible)
+    if(gridVisible | isometricVisible)
     {
         for(int i = -gridWidth; i <= width; i+=gridWidth)
         {
@@ -225,19 +225,19 @@ void Board::draw(sf::RenderWindow& win)
     }
     if(isometricVisible)
     {
-        for(int j = -int(extraIsoDistance); j <= gridWidth+width; j+=gridWidth)
+        for(int j = -int(extraIsoDistance)-(gridWidth*width); j <= width; j+=gridWidth*2)
         {
             //draw downward slopes
-            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance));
+            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance+(height*2)));
             isoline.setPosition(j+backOffset.x, -gridWidth+backOffset.y);
             isoline.setFillColor(Color(Color::Gray).getSFColor());
             isoline.setRotation(-60);
             win.draw(isoline);
         }
-        for(int j = 0; j <= int(extraIsoDistance)+width; j+=gridWidth)
+        for(int j = -gridWidth*2; j <= int(extraIsoDistance)+(gridWidth*width); j+=gridWidth*2)
         {
             //draw upward slopes
-            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance));
+            sf::RectangleShape isoline(sf::Vector2f(1, extraIsoDistance+(height*2)));
             isoline.setPosition(j+backOffset.x, -gridWidth+backOffset.y);
             isoline.setFillColor(Color(Color::Gray).getSFColor());
             isoline.setRotation(60);
